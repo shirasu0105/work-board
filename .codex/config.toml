@@ -1,0 +1,9 @@
+# AUTO-GENERATED FROM .harness/ — DO NOT EDIT.
+# Edit .harness/{permissions,mcp}/ and run `npm run sync:harness`.
+
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]

@@ -1,0 +1,26 @@
+{
+  "$schema": "./servers.schema.json",
+  "_comment": "ハーネスが参照する MCP サーバの正規定義。sync-harness.mjs が各ツール固有の場所へ展開する。",
+  "servers": [
+    {
+      "id": "playwright",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "tools_only": [],
+      "_purpose": "Verifier がブラウザ自動化と検証に使う。Claude Code・Codex CLI・VS Code Copilot のすべてに展開"
+    },
+    {
+      "id": "aidesigner",
+      "type": "external-managed",
+      "tools_only": ["claude"],
+      "_purpose": "OAuth ベースの AIDesigner MCP。.claude/ にだけ enabledMcpjsonServers として登録。Codex/Copilot には展開しない"
+    },
+    {
+      "id": "ide",
+      "type": "builtin",
+      "tools_only": ["claude"],
+      "_purpose": "Claude Code 内蔵の IDE 診断 MCP（mcp__ide__getDiagnostics）。permissions 経由で許可するだけ"
+    }
+  ]
+}

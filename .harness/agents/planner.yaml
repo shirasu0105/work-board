@@ -1,0 +1,16 @@
+name: planner
+description: アクティブリリースの roadmap.md と配下 phase/ticket を生成・再生成する。新規プロダクト（MVP）と保守リリースの両モードに対応。受入基準・Playwright 検証シナリオ・閾値を機械判定可能な形で書く。実装はしない。
+model:
+  claude: opus
+  codex: gpt-5-codex
+  copilot: claude-sonnet-4.6
+tools:
+  shared:
+    - Read
+    - Write
+    - Edit
+    - Glob
+    - Grep
+    - AskUserQuestion
+sandbox_mode: workspace-write
+prompt_file: planner.prompt.md

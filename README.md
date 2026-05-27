@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# python-manager
 
-## Getting Started
+仕事効率化Webアプリ
 
-First, run the development server:
+## アプリの起動
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+→ <http://localhost:3000> を開く。初回起動時にセットアップウィザードで Python 実行ファイルパス・ツールルート・出力先・ログ先を設定する。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+ビルド／型チェック／lint:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-## Learn More
+詳細な使い方は [`docs/manuals/user-guide.html`](docs/manuals/user-guide.html) を参照（編集元は `.harness/manuals/user-guide.md`、`npm run build:manuals` で生成）。
 
-To learn more about Next.js, take a look at the following resources:
+## 開発パイプライン（3 ツール対応ハーネス）
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+このリポジトリは **Planner / Implementer / Verifier** の 3 サブエージェントによる開発パイプラインを **Claude Code / OpenAI Codex CLI / GitHub Copilot（VS Code）** の 3 ツールから同等に動かせるように設計されている。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### ハーネスの編集ルール
 
-## Deploy on Vercel
+ルートの `CLAUDE.md` `AGENTS.md`、`.claude/`、`.codex/`、`.github/`、`.vscode/` 配下のハーネス関連ファイルは **すべて自動生成物**。編集元は `.harness/` ディレクトリのみ。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+ハーネスを変更したいとき：
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# 1. .harness/ 配下を編集（agents/, commands/, instructions/, mcp/, permissions/）
+# 2. 各ツール固有ファイルを再生成
+npm run sync:harness
+
+# 3. CI / pre-commit で乖離検出（差分があれば exit 1）
+npm run check:harness
+```
+
+詳細は [`docs/manuals/developer-guide.html`](docs/manuals/developer-guide.html)（編集元は `.harness/manuals/developer-guide.md`、`npm run build:manuals` で生成）または `.harness/instructions/AGENTS.md` を参照。
+
+### 起動コマンド早見表
+
+| コマンド | 用途 |
+|---|---|
+| `/plan-mvp [追加要望]` | 新規プロダクトの初期 roadmap 生成（v1.0.0 用） |
+| `/plan-release [要求リスト]` | 保守リリースのチケット化＋ roadmap 生成（v1.1.0 以降） |
+| `/implement-phase` | アクティブリリースの次 TODO フェーズを実装→検証 |
+| `/implement-phase 4` | フェーズ 4 を対象に実装→検証 |
+| `/finalize-release` | アクティブリリースを確定（リリースノート生成＋ロック） |
+
+各ツールでの呼び出し方:
+
+- **Claude Code**: スラッシュコマンドとして上記がそのまま使える
+- **OpenAI Codex CLI**: `/<command-name>` で同名のプロンプトが起動（`.codex/prompts/` を Codex CLI が自動検出）
+- **GitHub Copilot（VS Code）**: Copilot Chat 入力で `/<command-name>` 候補から選択（`.github/prompts/`）。サブエージェントは chat mode セレクタから `planner` / `implementer` / `verifier` を切替
+
+### Codex CLI での使い方
+
+1. Codex CLI をインストール（公式ドキュメント参照）
+2. リポジトリで `codex` を起動
+3. 初回は `Trust this project?` で `y` を選択（プロジェクトスコープの `.codex/config.toml` を読み込ませる）
+4. `/` を入力してコマンド一覧を確認 → `plan-release` `implement-phase` `finalize-release` `plan-mvp` が候補に出る
+5. サブエージェントは「明示呼び出し」のみ動くため、各コマンドの本文がそのとおりサブエージェントを起動するように書かれている
+
+### GitHub Copilot（VS Code）での使い方
+
+1. VS Code で本リポジトリを開く（GitHub Copilot 拡張＋ Copilot Chat 拡張が必要）
+2. Copilot Chat ペインを開く
+3. `.vscode/mcp.json` に基づき Playwright MCP サーバが自動接続される（初回はユーザー承認）
+4. 「mode」セレクタから `planner` / `implementer` / `verifier` の chat mode を選んで実行
+5. 入力欄で `/plan-release` `/implement-phase` `/finalize-release` `/plan-mvp` がプロンプト候補に出る
+6. 引数を求められたら入力（`${input:arguments}` がプロンプト経由で取得される）
+
+**注意**: VS Code Copilot にはサブエージェント自動呼び出しがないため、`/implement-phase` の Implementer→Verifier ループは **手動でモード切替** して進める。
+
+## ディレクトリ構造
+
+```
+.harness/                # ハーネスの単一ソース（編集する場所）
+├─ instructions/         # AGENTS.md ＋ 各ツール addendum
+├─ agents/               # planner/implementer/verifier の中立定義
+├─ commands/             # plan-mvp/plan-release/implement-phase/finalize-release
+├─ mcp/servers.json      # MCP サーバ正規定義
+└─ permissions/allow.json
+
+.claude/                 # ↑から生成（Claude Code が読む）
+.codex/                  # ↑から生成（Codex CLI が読む）
+.github/                 # ↑から生成（Copilot が読む：copilot-instructions/chatmodes/prompts）
+.vscode/                 # ↑から生成（VS Code Copilot 用 mcp.json）
+
+docs/
+├─ requirements.md       # 要件の一次情報（不変）
+├─ design-references/    # UI 参考画像（任意）
+├─ DESIGN.md             # デザイントークン（任意）
+├─ releases/             # リリース履歴
+│  ├─ v1.0.0/            # MVP（released）
+│  └─ v1.1.0/            # 保守リリース（released）
+└─ manuals/              # .harness/manuals/ から生成
+   ├─ developer-guide.html
+   └─ user-guide.html
+
+scripts/
+├─ sync-harness.mjs      # .harness → 各ツール固有ファイル生成
+└─ build-manuals.mjs     # .harness/manuals/*.md → docs/manuals/*.html
+
+app/, components/, lib/  # アプリ本体（Next.js App Router）
+```

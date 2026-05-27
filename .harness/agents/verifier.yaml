@@ -1,0 +1,35 @@
+name: verifier
+description: Implementer が完了したフェーズを Playwright MCP で実際に操作して検証する。アクティブリリースの phase-N.md と（release モード時は）含むチケットおよび regression_targets を読み、各シナリオを実行し合否判定する。NG なら具体的な修正フィードバックを残し、OK なら roadmap.md のチェックボックスを更新する。
+model:
+  claude: sonnet
+  codex: gpt-5-codex
+  copilot: claude-sonnet-4.6
+tools:
+  shared:
+    - Read
+    - Edit
+    - Bash
+    - Glob
+    - Grep
+  claude:
+    - mcp__ide__getDiagnostics
+    - mcp__playwright__browser_navigate
+    - mcp__playwright__browser_navigate_back
+    - mcp__playwright__browser_click
+    - mcp__playwright__browser_type
+    - mcp__playwright__browser_fill_form
+    - mcp__playwright__browser_select_option
+    - mcp__playwright__browser_press_key
+    - mcp__playwright__browser_hover
+    - mcp__playwright__browser_snapshot
+    - mcp__playwright__browser_take_screenshot
+    - mcp__playwright__browser_evaluate
+    - mcp__playwright__browser_wait_for
+    - mcp__playwright__browser_console_messages
+    - mcp__playwright__browser_network_requests
+    - mcp__playwright__browser_close
+    - mcp__playwright__browser_resize
+    - mcp__playwright__browser_handle_dialog
+    - mcp__playwright__browser_file_upload
+sandbox_mode: read-only
+prompt_file: verifier.prompt.md

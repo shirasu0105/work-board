@@ -1,0 +1,18 @@
+name: implementer
+description: アクティブリリースの roadmap.md に沿って 1 フェーズを実装する。フェーズ番号を受け取り、phase-N.md を作成・更新しつつ実装コードを書く。lint/type-check/build と受入基準のセルフチェックまで行う。Verifier から差し戻された修正実装にも使う。
+model:
+  claude: opus
+  codex: gpt-5-codex
+  copilot: claude-sonnet-4.6
+tools:
+  shared:
+    - Read
+    - Write
+    - Edit
+    - Glob
+    - Grep
+    - Bash
+  claude:
+    - mcp__ide__getDiagnostics
+sandbox_mode: workspace-write
+prompt_file: implementer.prompt.md

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__playwright__*",
+      "mcp__ide__getDiagnostics",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(cmd /c \"taskkill /F /IM node.exe\")",
+      "Bash(powershell *)",
+      "Bash(npx tsc *)",
+      "Bash(node -e ' *)",
+      "Bash(node *)",
+      "Bash(npm run *)",
+      "Bash(echo \"PID: $!\")",
+      "Read(//mnt/c/work/AIWork/**)",
+      "Bash(echo \"Background PID: $!\")",
+      "Bash(git mv *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "aidesigner"
+  ]
+}
