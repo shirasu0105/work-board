@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens (Notion 風・温かいニュートラル＋細い border)
+ * - DESIGN.md §2 Color Palette / §3 Typography / §5 Layout に準拠
+ * - フォントは next/font/google の Inter を --font-sans に注入する
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Ink (text) */
+  --ink: rgba(0, 0, 0, 0.95);
+  --ink-2: #615d59;
+  --ink-3: #a39e98;
+
+  /* Paper (surfaces) */
+  --paper: #ffffff;
+  --paper-2: #f6f5f4;
+
+  /* Accent */
+  --accent: #0075de;
+  --accent-hover: #005bab;
+  --accent-focus: #097fe8;
+  --accent-bg: #f2f9ff;
+
+  /* Warm gray scale */
+  --warm-gray-50: #f6f5f4;
+  --warm-gray-300: #a39e98;
+  --warm-gray-500: #615d59;
+  --warm-gray-700: #31302e;
+
+  /* Semantic */
+  --success: #1aae39;
+  --warning: #dd5b00;
+  --info: #2a9d99;
+
+  /* Borders & shadows */
+  --border-whisper: rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.04),
+    0 2.025px 7.84688px rgba(0, 0, 0, 0.027),
+    0 0.8px 2.925px rgba(0, 0, 0, 0.02),
+    0 0.175px 1.04062px rgba(0, 0, 0, 0.01);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-focus: var(--accent-focus);
+  --color-accent-bg: var(--accent-bg);
+
+  --color-warm-gray-50: var(--warm-gray-50);
+  --color-warm-gray-300: var(--warm-gray-300);
+  --color-warm-gray-500: var(--warm-gray-500);
+  --color-warm-gray-700: var(--warm-gray-700);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+
+  --color-border-whisper: var(--border-whisper);
+
+  --font-sans: var(--font-inter), Inter, -apple-system, system-ui, "Segoe UI",
+    Helvetica, "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3",
+    "Yu Gothic", "Meiryo", Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "lnum", "locl";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Whisper border utility (Tailwind 4 では border-(--var) も可だが
+   よく使う whisper border は専用ユーティリティで明示する) */
+.border-whisper {
+  border: 1px solid var(--border-whisper);
+}
+
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+/* Focus ring: Notion Blue */
+:focus-visible {
+  outline: 2px solid var(--accent-focus);
+  outline-offset: 2px;
 }
