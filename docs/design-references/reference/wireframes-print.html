@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>仕事効率化アプリ ワイヤーフレーム — 印刷用 (① + ⑤)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yomogi&family=Klee+One:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sketch.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #d9d6cf; font-family: "Yomogi", "Klee One", cursive; color: #1a1a1a; }
+  .page {
+    width: 1400px;
+    margin: 24px auto;
+    background: var(--paper);
+    padding: 32px 36px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    page-break-after: always;
+    break-after: page;
+  }
+  .page:last-child { page-break-after: auto; }
+  .page-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-bottom: 1.5px solid var(--ink); padding-bottom: 8px; margin-bottom: 18px;
+  }
+  .page-head .num { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--ink-3); letter-spacing: .08em; }
+  .page-head h2 { margin: 0; font-family: "Yomogi", cursive; font-size: 30px; font-weight: 700; }
+  .page-head .meta { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-3); }
+  .screen-frame {
+    width: 1280px; height: 800px;
+    border: 1.5px solid var(--ink-4); border-radius: 6px; overflow: hidden;
+    background: var(--paper);
+    margin: 0 auto;
+  }
+  .cover {
+    width: 1400px; margin: 24px auto; background: var(--paper); padding: 80px 60px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08); page-break-after: always; break-after: page;
+  }
+  .cover h1 { font-family: "Yomogi", cursive; font-size: 56px; margin: 0 0 12px; }
+  .cover .lead { font-size: 18px; color: var(--ink-2); margin: 0 0 24px; }
+  .cover .meta { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-3); }
+  .toc { margin-top: 36px; }
+  .toc h3 { font-family: "Yomogi", cursive; font-size: 20px; margin: 24px 0 6px; }
+  .toc ol { margin: 0; padding-left: 22px; font-size: 14px; line-height: 1.85; }
+  .mobile-row {
+    display: flex; gap: 28px; justify-content: center; align-items: flex-start; flex-wrap: wrap;
+  }
+  .mobile-card {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .mobile-label {
+    font-family: "Yomogi", cursive; font-size: 15px; font-weight: 700;
+  }
+  .mobile-frame {
+    width: 360px; height: 720px;
+    border: 2px solid var(--ink); border-radius: 28px; overflow: hidden;
+    background: var(--paper);
+    box-shadow: 4px 6px 0 rgba(0,0,0,.08);
+  }
+  @page {
+    size: 1500px 1000px;
+    margin: 0;
+  }
+  @media print {
+    html, body { background: white; }
+    .page, .cover { margin: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- sketchy filter -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="sketchy">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.6" />
+    </filter>
+  </defs>
+</svg>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="meta">REFERENCE WIREFRAMES — v0.1 / 2026-05</div>
+  <h1><span class="sk-hl-accent">仕事効率化アプリ</span><br/>ワイヤーフレーム参考集</h1>
+  <p class="lead">
+    GTD + 『メモの魔力』ベースの個人向けタスク／メモ管理アプリ。<br/>
+    本書はデスクトップ版（全9画面）とモバイル版（主要5画面）をまとめた参考デザインです。
+  </p>
+  <div class="toc">
+    <h3>① デスクトップ版 — 全9画面</h3>
+    <ol>
+      <li>ホーム</li>
+      <li>Inbox</li>
+      <li>タスク（かんばん）</li>
+      <li>プロジェクト</li>
+      <li>メモ一覧</li>
+      <li>メモ作成・編集（種別タブ切替案）</li>
+      <li>日次ジャーナル</li>
+      <li>週次レビュー</li>
+      <li>設定 — カテゴリ管理</li>
+    </ol>
+    <h3>⑤ モバイル版 — 主要5画面</h3>
+    <ol>
+      <li>ホーム</li>
+      <li>Inbox</li>
+      <li>タスク</li>
+      <li>メモ作成</li>
+      <li>日次ジャーナル</li>
+    </ol>
+  </div>
+  <p class="meta" style="margin-top:48px">
+    レイアウト方針: サイドナビ + シングルカラム + カード中心 / タスクは かんばん 主・リスト副 / 配色: ニュートラル + アクセント coral<br/>
+    フォント: Yomogi (handwritten), Klee One, JetBrains Mono / SVG turbulence による手書き風ストローク
+  </p>
+</div>
+
+<!-- DESKTOP SCREENS — populated by script -->
+<div id="desktop-pages"></div>
+
+<!-- MOBILE SCREENS — populated by script -->
+<div id="mobile-pages"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="sketch-prims.jsx"></script>
+<script type="text/babel" src="screens-1.jsx"></script>
+<script type="text/babel" src="screens-2.jsx"></script>
+<script type="text/babel" src="screens-3.jsx"></script>
+<script type="text/babel" src="screens-4.jsx"></script>
+<script type="text/babel" src="screens-mobile.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const desktopScreens = [
+  { num: "01", title: "ホーム", note: "今日やること / 確認予定日を迎えた待ち / Inbox未整理 / 進行中Pj / 最近メモ / 日次・週次レビュー導線", Comp: HomeScreen },
+  { num: "02", title: "Inbox", note: "上部の常設バーで素早く追加 → 後から タスク / Pj / Someday / 削除 へ振り分け", Comp: () => <InboxScreen quickAddVariant="topbar" /> },
+  { num: "03", title: "タスク（かんばん）", note: "未着手 / 対応中 / 待ち / 保留 / 完了 の5列。カード = タスク。リスト表示への切替あり", Comp: TasksScreen },
+  { num: "04", title: "プロジェクト", note: "2カラムのカード一覧。完了条件・進捗バー・期限・状態を1枚で確認", Comp: ProjectsScreen },
+  { num: "05", title: "メモ一覧", note: "左タイムライン + 右に種別/カテゴリ別カウント。キーワード・種別・カテゴリ・期間で絞り込み", Comp: MemosScreen },
+  { num: "06", title: "メモ作成・編集（種別タブ切替案）", note: "上部タブで種別切替 → 必須/任意項目が自動で切り替わる。ファクト→抽象化→転用 を含む種別あり", Comp: MemoEditTabs },
+  { num: "07", title: "日次ジャーナル", note: "左: 今日のひとこと + 今日完了 / 右: 未完了タスクから明日やることを選ぶ", Comp: JournalScreen },
+  { num: "08", title: "週次レビュー", note: "6ステップを順番に実施。Inbox/Pj/未完タスク/待ち/Someday/来週重点 を棚卸し", Comp: ReviewScreen },
+  { num: "09", title: "設定 — カテゴリ管理", note: "ドラッグ並び替え / 表示ON-OFF。MVPでは設定はこの1画面のみ", Comp: SettingsScreen },
+];
+
+const desktopRoot = document.getElementById("desktop-pages");
+desktopScreens.forEach((s) => {
+  const page = document.createElement("div");
+  page.className = "page";
+  desktopRoot.appendChild(page);
+
+  const head = document.createElement("div");
+  head.className = "page-head";
+  head.innerHTML = `
+    <div>
+      <div class="num">DESKTOP · ${s.num} / 09</div>
+      <h2>${s.title}</h2>
+    </div>
+    <div class="meta">1280 × 800</div>
+  `;
+  page.appendChild(head);
+
+  if (s.note) {
+    const note = document.createElement("div");
+    note.style.cssText = "font-family: 'Yomogi', cursive; font-size: 14px; color: var(--ink-2); margin-bottom: 14px; line-height: 1.6;";
+    note.textContent = "▸ " + s.note;
+    page.appendChild(note);
+  }
+
+  const frame = document.createElement("div");
+  frame.className = "screen-frame";
+  page.appendChild(frame);
+  ReactDOM.createRoot(frame).render(<s.Comp />);
+});
+
+const mobileScreens = [
+  { label: "ホーム", Comp: MobileHome },
+  { label: "Inbox", Comp: MobileInbox },
+  { label: "タスク", Comp: MobileTasks },
+  { label: "メモ作成", Comp: MobileMemoNew },
+  { label: "日次ジャーナル", Comp: MobileJournal },
+];
+
+// Mobile page 1: first 3 screens
+// Mobile page 2: last 2 screens
+const mobileRoot = document.getElementById("mobile-pages");
+function makeMobilePage(items, pageNum, total) {
+  const page = document.createElement("div");
+  page.className = "page";
+  mobileRoot.appendChild(page);
+
+  const head = document.createElement("div");
+  head.className = "page-head";
+  head.innerHTML = `
+    <div>
+      <div class="num">MOBILE · ${pageNum} / ${total}</div>
+      <h2>モバイル版 主要画面</h2>
+    </div>
+    <div class="meta">360 × 720 each</div>
+  `;
+  page.appendChild(head);
+
+  const note = document.createElement("div");
+  note.style.cssText = "font-family: 'Yomogi', cursive; font-size: 14px; color: var(--ink-2); margin-bottom: 18px; line-height: 1.6;";
+  note.textContent = "▸ ボトムタブ（ホーム / Inbox / + クイック / タスク / メモ）+ 中央クイック追加ボタン";
+  page.appendChild(note);
+
+  const row = document.createElement("div");
+  row.className = "mobile-row";
+  page.appendChild(row);
+
+  items.forEach((m) => {
+    const card = document.createElement("div");
+    card.className = "mobile-card";
+    const label = document.createElement("div");
+    label.className = "mobile-label";
+    label.textContent = m.label;
+    card.appendChild(label);
+    const frame = document.createElement("div");
+    frame.className = "mobile-frame";
+    card.appendChild(frame);
+    row.appendChild(card);
+    ReactDOM.createRoot(frame).render(<m.Comp />);
+  });
+}
+makeMobilePage(mobileScreens.slice(0, 3), 1, 2);
+makeMobilePage(mobileScreens.slice(3), 2, 2);
+</script>
+
+</body>
+</html>

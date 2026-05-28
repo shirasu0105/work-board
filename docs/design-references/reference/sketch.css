@@ -1,0 +1,267 @@
+/* === Hand-sketched wireframe primitives === */
+
+:root {
+  --ink: #1a1a1a;
+  --ink-2: #4a4a4a;
+  --ink-3: #8a8a8a;
+  --ink-4: #c8c4be;
+  --paper: #fbfaf6;
+  --paper-2: #f3f0e8;
+  --accent: #d96642; /* coral accent for highlights */
+  --accent-soft: #fde6dd;
+  --hl: #fef0a8; /* yellow highlighter */
+  --hand: "Yomogi", "Klee One", "Comic Sans MS", cursive;
+  --hand2: "Klee One", "Yomogi", serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* sketchy hand-drawn border using SVG noise filter */
+.sk {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  filter: url(#sketchy);
+  position: relative;
+}
+
+.sk-thin { border-width: 1px; }
+.sk-thick { border-width: 2.5px; }
+.sk-dash { border-style: dashed; }
+.sk-dot { border-style: dotted; }
+
+.sk-card {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  padding: 10px 12px;
+  filter: url(#sketchy);
+}
+
+/* boxy input field */
+.sk-input {
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  background: #fff;
+  padding: 8px 10px;
+  font-family: var(--hand);
+  font-size: 14px;
+  color: var(--ink-3);
+  filter: url(#sketchy);
+}
+
+.sk-input-lg { font-size: 16px; padding: 12px 14px; }
+
+/* button — pill with sketchy stroke */
+.sk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: var(--hand);
+  font-size: 13px;
+  color: var(--ink);
+  filter: url(#sketchy);
+  cursor: pointer;
+}
+.sk-btn-primary { background: var(--ink); color: var(--paper); }
+.sk-btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+.sk-btn-ghost { background: transparent; border-color: var(--ink-3); color: var(--ink-2); }
+.sk-btn-sq { border-radius: 4px; }
+
+/* checkbox + radio */
+.sk-check {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 3px;
+  filter: url(#sketchy);
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.sk-check.done {
+  background: #fff;
+  position: relative;
+}
+.sk-check.done::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M2 8 L6 12 L14 3' stroke='%231a1a1a' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat;
+}
+.sk-radio {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  filter: url(#sketchy);
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+/* badge / chip */
+.sk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1.2px solid var(--ink);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-family: var(--hand);
+  font-size: 11px;
+  color: var(--ink);
+  background: var(--paper);
+  filter: url(#sketchy);
+  white-space: nowrap;
+}
+.sk-chip.accent { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.sk-chip.muted { color: var(--ink-3); border-color: var(--ink-3); }
+.sk-chip.solid { background: var(--ink); color: var(--paper); }
+
+/* image / icon placeholder — striped */
+.sk-ph {
+  border: 1.4px solid var(--ink-3);
+  background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(0,0,0,.05) 6px 7px);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  filter: url(#sketchy);
+}
+.sk-ph-x {
+  border: 1.4px solid var(--ink-3);
+  background:
+    linear-gradient(to top right, transparent calc(50% - 0.5px), var(--ink-4) calc(50% - 0.5px), var(--ink-4) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    linear-gradient(to top left, transparent calc(50% - 0.5px), var(--ink-4) calc(50% - 0.5px), var(--ink-4) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+  border-radius: 3px;
+  filter: url(#sketchy);
+}
+
+/* highlighter underline (used on screen titles) */
+.sk-hl {
+  background: linear-gradient(to bottom, transparent 60%, var(--hl) 60%, var(--hl) 92%, transparent 92%);
+  padding: 0 4px;
+}
+.sk-hl-accent {
+  background: linear-gradient(to bottom, transparent 60%, var(--accent-soft) 60%, var(--accent-soft) 92%, transparent 92%);
+  padding: 0 4px;
+}
+
+/* small dotted/dashed underline for hints */
+.sk-u-dot { border-bottom: 1.5px dotted var(--ink-3); padding-bottom: 1px; }
+.sk-u-dash { border-bottom: 1.5px dashed var(--ink); padding-bottom: 1px; }
+
+/* squiggly underline for nav active */
+.sk-squig {
+  position: relative;
+}
+.sk-squig::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  bottom: -6px;
+  height: 6px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 6'><path d='M0 3 Q 5 0 10 3 T 20 3 T 30 3 T 40 3' stroke='%23d96642' stroke-width='1.6' fill='none'/></svg>") repeat-x;
+  background-size: auto 6px;
+}
+
+/* arrow */
+.sk-arrow { color: var(--ink-2); font-family: var(--hand); }
+
+/* divider */
+.sk-div {
+  height: 1.5px;
+  background: var(--ink);
+  filter: url(#sketchy);
+  border-radius: 2px;
+  margin: 8px 0;
+}
+.sk-div-dash {
+  border-top: 1.5px dashed var(--ink-3);
+  margin: 8px 0;
+}
+
+/* screen frame title bar above each wireframe */
+.sk-screen {
+  background: var(--paper);
+  font-family: var(--hand);
+  color: var(--ink);
+}
+
+/* tiny tag w/ corner crease */
+.sk-tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .04em;
+  padding: 2px 6px;
+  background: #fff;
+  border: 1px solid var(--ink-3);
+  color: var(--ink-2);
+}
+
+/* sticky note */
+.sk-stick {
+  background: var(--hl);
+  border: 1px solid #c9b552;
+  padding: 8px 10px;
+  font-family: var(--hand);
+  font-size: 12px;
+  color: #5a4a2a;
+  transform: rotate(-1.2deg);
+  box-shadow: 2px 3px 0 rgba(0,0,0,.06);
+}
+
+/* lined paper effect */
+.sk-lined {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 23px, rgba(0,0,0,.08) 23px 24px),
+    var(--paper);
+}
+
+/* dot grid effect */
+.sk-dotgrid {
+  background:
+    radial-gradient(circle, rgba(0,0,0,.18) 1px, transparent 1.5px) 0 0/12px 12px,
+    var(--paper);
+}
+
+/* device label above artboard */
+.sk-device-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+
+/* shared layout helpers (kept short) */
+.row { display: flex; }
+.col { display: flex; flex-direction: column; }
+.gap-4 { gap: 4px; } .gap-6 { gap: 6px; } .gap-8 { gap: 8px; }
+.gap-10 { gap: 10px; } .gap-12 { gap: 12px; } .gap-16 { gap: 16px; } .gap-20 { gap: 20px; }
+.between { justify-content: space-between; }
+.center { align-items: center; justify-content: center; }
+.aic { align-items: center; }
+.ais { align-items: stretch; }
+.jcb { justify-content: space-between; }
+.jce { justify-content: flex-end; }
+.f1 { flex: 1 1 auto; min-width: 0; }
+.fwrap { flex-wrap: wrap; }
+.mt-4 { margin-top: 4px; } .mt-8 { margin-top: 8px; } .mt-12 { margin-top: 12px; } .mt-16 { margin-top: 16px; }
+.mb-4 { margin-bottom: 4px; } .mb-8 { margin-bottom: 8px; } .mb-12 { margin-bottom: 12px; } .mb-16 { margin-bottom: 16px; }
+.p-8 { padding: 8px; } .p-12 { padding: 12px; } .p-16 { padding: 16px; } .p-20 { padding: 20px; } .p-24 { padding: 24px; }
+.muted { color: var(--ink-3); }
+.t-12 { font-size: 12px; } .t-13 { font-size: 13px; } .t-14 { font-size: 14px; }
+.t-16 { font-size: 16px; } .t-18 { font-size: 18px; } .t-22 { font-size: 22px; } .t-28 { font-size: 28px; }
+.bold { font-weight: 700; }
+.hand { font-family: var(--hand); }
+.hand2 { font-family: var(--hand2); }
+.mono { font-family: var(--mono); }
+.tc { text-align: center; }
+.tr { text-align: right; }
+.nowrap { white-space: nowrap; }
