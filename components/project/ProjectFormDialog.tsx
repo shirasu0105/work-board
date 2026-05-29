@@ -5,88 +5,91 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/cn";
 import type { CategoryDTO } from "@/lib/db/category";
-import type { ProjectDTO } from "@/lib/types/project";
+import {
+  PROJECT_STATUSES,
+  PROJECT_STATUS_LABELS,
+  type ProjectStatus,
+} from "@/lib/types/project";
 
-export type TaskFormValue = {
-  title: string;
+export type ProjectFormValue = {
+  name: string;
   categoryId: string;
+  completion: string;
   dueDate: string;
-  note: string;
-  /** プロジェクト紐付け（任意）。未選択は空文字。 */
-  projectId: string;
+  purpose: string;
+  status: ProjectStatus;
 };
 
-/** プロジェクト選択肢（id と表示名のみ）。 */
-export type ProjectOption = Pick<ProjectDTO, "id" | "name">;
-
-export type TaskFormDialogProps = {
+export type ProjectFormDialogProps = {
   open: boolean;
   mode: "add" | "edit";
   /** 選択可能なカテゴリ（有効なもののみを想定） */
   categories: CategoryDTO[];
-  /** 選択可能なプロジェクト（任意紐付け用） */
-  projects?: ProjectOption[];
-  initial?: TaskFormValue;
-  /** true のときタスク名入力欄を読み取り専用にする（Inbox からの変換時） */
-  lockTitle?: boolean;
+  initial?: ProjectFormValue;
+  /** true のときプロジェクト名入力欄を読み取り専用にする（Inbox からの変換時） */
+  lockName?: boolean;
+  /** ステータス欄を隠す（新規・変換時は active 固定で良い） */
+  hideStatus?: boolean;
   busy?: boolean;
   errorMessage?: string | null;
   onCancel: () => void;
-  onSubmit: (value: TaskFormValue) => void;
+  onSubmit: (value: ProjectFormValue) => void;
 };
 
 /**
- * 新規/編集兼用のタスクフォーム（要件書 §10.5.3）。
- * - 必須: タスク名・カテゴリ。どちらか未入力なら保存ボタンは disabled
- * - 任意: プロジェクト（任意紐付け）・期限・メモ
- *
- * CategoryFormDialog と同様、`open` 切替ごとに key で内部状態をリセットする。
+ * 新規/編集兼用のプロジェクトフォーム（要件書 §10.4.3）。
+ * - 必須: プロジェクト名・カテゴリ
+ * - 任意: 完了条件・期限・目的
+ * - ステータス: 進行中 / 未着手 / 保留 / 完了（編集時に切替）
  */
-export function TaskFormDialog(props: TaskFormDialogProps) {
+export function ProjectFormDialog(props: ProjectFormDialogProps) {
   if (!props.open) return null;
-  const key = `${props.mode}:${props.initial?.title ?? ""}:${
+  const key = `${props.mode}:${props.initial?.name ?? ""}:${
     props.initial?.categoryId ?? ""
-  }:${props.initial?.dueDate ?? ""}:${props.initial?.note ?? ""}:${
-    props.initial?.projectId ?? ""
-  }`;
-  return <TaskFormDialogInner key={key} {...props} />;
+  }:${props.initial?.status ?? ""}`;
+  return <ProjectFormDialogInner key={key} {...props} />;
 }
 
-function TaskFormDialogInner({
+function ProjectFormDialogInner({
   mode,
   categories,
-  projects = [],
   initial,
-  lockTitle = false,
+  lockName = false,
+  hideStatus = false,
   busy = false,
   errorMessage,
   onCancel,
   onSubmit,
-}: TaskFormDialogProps) {
-  const titleId = useId();
-  const categoryId = useId();
-  const projectFieldId = useId();
+}: ProjectFormDialogProps) {
+  const nameId = useId();
+  const categoryFieldId = useId();
+  const completionId = useId();
   const dueId = useId();
-  const noteId = useId();
+  const purposeId = useId();
+  const statusId = useId();
   const errorId = useId();
 
-  const [title, setTitle] = useState(initial?.title ?? "");
+  const [name, setName] = useState(initial?.name ?? "");
   const [category, setCategory] = useState(
     initial?.categoryId ?? categories[0]?.id ?? ""
   );
-  const [project, setProject] = useState(initial?.projectId ?? "");
+  const [completion, setCompletion] = useState(initial?.completion ?? "");
   const [dueDate, setDueDate] = useState(initial?.dueDate ?? "");
-  const [note, setNote] = useState(initial?.note ?? "");
-  const titleRef = useRef<HTMLInputElement | null>(null);
+  const [purpose, setPurpose] = useState(initial?.purpose ?? "");
+  const [status, setStatus] = useState<ProjectStatus>(
+    initial?.status ?? "active"
+  );
+  const nameRef = useRef<HTMLInputElement | null>(null);
   const categoryRef = useRef<HTMLSelectElement | null>(null);
 
   useEffect(() => {
     const id = window.setTimeout(() => {
-      if (lockTitle) categoryRef.current?.focus();
-      else titleRef.current?.focus();
+      // 名前ロック時はカテゴリへフォーカス（変換フローで最初に選ぶ欄）
+      if (lockName) categoryRef.current?.focus();
+      else nameRef.current?.focus();
     }, 0);
     return () => window.clearTimeout(id);
-  }, [lockTitle]);
+  }, [lockName]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -99,29 +102,30 @@ function TaskFormDialogInner({
     return () => window.removeEventListener("keydown", onKey);
   }, [onCancel]);
 
-  const trimmedTitle = title.trim();
-  const canSubmit = trimmedTitle.length > 0 && category !== "" && !busy;
+  const trimmedName = name.trim();
+  const canSubmit = trimmedName.length > 0 && category !== "" && !busy;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
     onSubmit({
-      title: trimmedTitle,
+      name: trimmedName,
       categoryId: category,
+      completion: completion.trim(),
       dueDate: dueDate.trim(),
-      note: note.trim(),
-      projectId: project,
+      purpose: purpose.trim(),
+      status,
     });
   };
 
-  const dialogTitle = mode === "add" ? "タスクを追加" : "タスクを編集";
+  const dialogTitle = mode === "add" ? "プロジェクトを追加" : "プロジェクトを編集";
   const submitLabel = mode === "add" ? "追加する" : "保存する";
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-labelledby={`${titleId}-dialog-title`}
+      aria-labelledby={`${nameId}-dialog-title`}
       className={cn(
         "fixed inset-0 z-50 flex items-center justify-center",
         "bg-black/30 px-4"
@@ -133,13 +137,13 @@ function TaskFormDialogInner({
       <form
         onSubmit={handleSubmit}
         className={cn(
-          "w-full max-w-[480px] rounded-[12px] bg-paper p-6",
+          "max-h-[90vh] w-full max-w-[480px] overflow-auto rounded-[12px] bg-paper p-6",
           "border-whisper shadow-card"
         )}
       >
         <div className="mb-4 flex items-start justify-between gap-3">
           <h2
-            id={`${titleId}-dialog-title`}
+            id={`${nameId}-dialog-title`}
             className="text-[16px] font-semibold leading-tight text-ink"
           >
             {dialogTitle}
@@ -155,47 +159,47 @@ function TaskFormDialogInner({
         </div>
 
         <div className="flex flex-col gap-4">
-          {/* タスク名（必須） */}
+          {/* プロジェクト名（必須） */}
           <div className="flex flex-col gap-1">
             <label
-              htmlFor={titleId}
+              htmlFor={nameId}
               className="text-[12px] font-medium text-ink-2"
             >
-              タスク名
+              プロジェクト名
               <span className="ml-1 text-[color:var(--warning)]">*</span>
             </label>
             <Input
-              id={titleId}
-              ref={titleRef}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              readOnly={lockTitle}
-              placeholder="例: ヒアリング項目をまとめる"
+              id={nameId}
+              ref={nameRef}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              readOnly={lockName}
+              placeholder="例: 年間計画化"
               maxLength={200}
               autoComplete="off"
               aria-required="true"
-              aria-invalid={trimmedTitle.length === 0}
-              data-testid="task-form-title"
+              aria-invalid={trimmedName.length === 0}
+              data-testid="project-form-name"
             />
           </div>
 
           {/* カテゴリ（必須） */}
           <div className="flex flex-col gap-1">
             <label
-              htmlFor={categoryId}
+              htmlFor={categoryFieldId}
               className="text-[12px] font-medium text-ink-2"
             >
               カテゴリ
               <span className="ml-1 text-[color:var(--warning)]">*</span>
             </label>
             <select
-              id={categoryId}
+              id={categoryFieldId}
               ref={categoryRef}
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               aria-required="true"
               aria-invalid={category === ""}
-              data-testid="task-form-category"
+              data-testid="project-form-category"
               className={cn(
                 "w-full rounded-[4px] border border-[color:var(--border-whisper)] bg-paper px-2.5 py-1.5",
                 "text-[14px] text-ink",
@@ -224,67 +228,22 @@ function TaskFormDialogInner({
             ) : null}
           </div>
 
-          {/* プロジェクト（任意） */}
+          {/* 完了条件（任意） */}
           <div className="flex flex-col gap-1">
             <label
-              htmlFor={projectFieldId}
+              htmlFor={completionId}
               className="text-[12px] font-medium text-ink-2"
             >
-              プロジェクト（任意）
-            </label>
-            <select
-              id={projectFieldId}
-              value={project}
-              onChange={(e) => setProject(e.target.value)}
-              data-testid="task-form-project"
-              className={cn(
-                "w-full rounded-[4px] border border-[color:var(--border-whisper)] bg-paper px-2.5 py-1.5",
-                "text-[14px] text-ink",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-focus focus-visible:border-accent"
-              )}
-            >
-              <option value="">プロジェクト無し</option>
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 期限（任意） */}
-          <div className="flex flex-col gap-1">
-            <label
-              htmlFor={dueId}
-              className="text-[12px] font-medium text-ink-2"
-            >
-              期限（任意）
-            </label>
-            <Input
-              id={dueId}
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              data-testid="task-form-due"
-            />
-          </div>
-
-          {/* メモ（任意） */}
-          <div className="flex flex-col gap-1">
-            <label
-              htmlFor={noteId}
-              className="text-[12px] font-medium text-ink-2"
-            >
-              メモ（任意）
+              完了条件（任意）
             </label>
             <textarea
-              id={noteId}
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="補足や手順など"
+              id={completionId}
+              value={completion}
+              onChange={(e) => setCompletion(e.target.value)}
+              placeholder="作業完了の判断基準（入力推奨）"
               maxLength={1000}
-              rows={3}
-              data-testid="task-form-note"
+              rows={2}
+              data-testid="project-form-completion"
               className={cn(
                 "w-full rounded-[4px] border border-[color:var(--border-whisper)] bg-paper px-2.5 py-1.5",
                 "text-[14px] text-ink placeholder:text-warm-gray-300 leading-[1.5]",
@@ -293,6 +252,74 @@ function TaskFormDialogInner({
               )}
             />
           </div>
+
+          {/* 期限（任意） */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor={dueId} className="text-[12px] font-medium text-ink-2">
+              期限（任意）
+            </label>
+            <Input
+              id={dueId}
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              data-testid="project-form-due"
+            />
+          </div>
+
+          {/* 目的（任意） */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor={purposeId}
+              className="text-[12px] font-medium text-ink-2"
+            >
+              目的（任意）
+            </label>
+            <textarea
+              id={purposeId}
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+              placeholder="このプロジェクトの目的"
+              maxLength={1000}
+              rows={2}
+              data-testid="project-form-purpose"
+              className={cn(
+                "w-full rounded-[4px] border border-[color:var(--border-whisper)] bg-paper px-2.5 py-1.5",
+                "text-[14px] text-ink placeholder:text-warm-gray-300 leading-[1.5]",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-focus focus-visible:border-accent",
+                "resize-y"
+              )}
+            />
+          </div>
+
+          {/* ステータス（編集時のみ） */}
+          {hideStatus ? null : (
+            <div className="flex flex-col gap-1">
+              <label
+                htmlFor={statusId}
+                className="text-[12px] font-medium text-ink-2"
+              >
+                ステータス
+              </label>
+              <select
+                id={statusId}
+                value={status}
+                onChange={(e) => setStatus(e.target.value as ProjectStatus)}
+                data-testid="project-form-status"
+                className={cn(
+                  "w-full rounded-[4px] border border-[color:var(--border-whisper)] bg-paper px-2.5 py-1.5",
+                  "text-[14px] text-ink",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-focus focus-visible:border-accent"
+                )}
+              >
+                {PROJECT_STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {PROJECT_STATUS_LABELS[s]}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {errorMessage ? (
             <p
@@ -319,7 +346,7 @@ function TaskFormDialogInner({
             variant="primary"
             disabled={!canSubmit}
             aria-disabled={!canSubmit}
-            data-testid="task-form-submit"
+            data-testid="project-form-submit"
           >
             {busy ? "保存中…" : submitLabel}
           </Button>

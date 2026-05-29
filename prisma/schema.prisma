@@ -38,7 +38,7 @@ model Category {
 }
 
 // ---------------------------------------------------------------------------
-// Project（Phase 4 で実装予定）
+// Project（Phase 4 実装対象）
 // ---------------------------------------------------------------------------
 model Project {
   id            String    @id @default(cuid())
@@ -46,7 +46,7 @@ model Project {
   purpose       String?
   completion    String?   // 完了条件
   dueDate       DateTime?
-  status        String    @default("active") // active / done / paused
+  status        String    @default("active") // active(進行中) / todo(未着手) / paused(保留) / done(完了)
   displayOrder  Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -117,7 +117,8 @@ model Memo {
 }
 
 // ---------------------------------------------------------------------------
-// InboxItem（Phase 4 で実装予定）
+// InboxItem（Phase 4 実装対象）
+// status: pending(未整理) / processed(タスク/プロジェクト化済み) / archived(Someday 化済み)
 // ---------------------------------------------------------------------------
 model InboxItem {
   id        String   @id @default(cuid())

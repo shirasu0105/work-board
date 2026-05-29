@@ -14,12 +14,14 @@ import { createTask, listTasks } from "@/lib/db/task";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const categoryId = searchParams.get("categoryId") ?? undefined;
+  const projectId = searchParams.get("projectId") ?? undefined;
   const includeDoneParam = searchParams.get("includeDone");
   const includeDone = includeDoneParam === "false" ? false : true;
 
   try {
     const tasks = await listTasks({
       categoryId: categoryId || undefined,
+      projectId: projectId || undefined,
       includeDone,
     });
     return NextResponse.json({ tasks });

@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import type { CategoryDTO } from "@/lib/db/category";
 import { type TaskDTO, type TaskStatus } from "@/lib/types/task";
+import type { ProjectOption } from "./TaskFormDialog";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { TaskList } from "./TaskList";
@@ -11,6 +12,12 @@ import { TaskFormDialog, type TaskFormValue } from "./TaskFormDialog";
 export type TaskManagerProps = {
   initialTasks: TaskDTO[];
   categories: CategoryDTO[];
+  /** プロジェクト紐付け用の選択肢 */
+  projects: ProjectOption[];
+  /** URL から渡されるプロジェクト絞り込み（任意） */
+  initialProjectId?: string;
+  /** 絞り込み中プロジェクトの表示名（バナー用） */
+  initialProjectName?: string;
 };
 
 type DialogState =
@@ -25,7 +32,13 @@ type DialogState =
  * - カテゴリ絞り込み・完了表示トグルはクライアント側のフィルタ条件として保持し、
  *   再フェッチ時に query へ反映する（サーバの絞り込みを信頼）
  */
-export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
+export function TaskManager({
+  initialTasks,
+  categories,
+  projects,
+  initialProjectId = "",
+  initialProjectName,
+}: TaskManagerProps) {
   const [tasks, setTasks] = useState<TaskDTO[]>(initialTasks);
   const [dialog, setDialog] = useState<DialogState>({ mode: "closed" });
   const [dialogError, setDialogError] = useState<string | null>(null);
@@ -36,6 +49,8 @@ export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
   // フィルタ条件
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [showDone, setShowDone] = useState(true);
+  // プロジェクト絞り込み（URL 由来。解除可能）
+  const [projectFilter, setProjectFilter] = useState<string>(initialProjectId);
 
   const editingInitial = useMemo<TaskFormValue | undefined>(() => {
     if (dialog.mode !== "edit") return undefined;
@@ -47,13 +62,15 @@ export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
       // input[type=date] は YYYY-MM-DD 形式
       dueDate: target.dueDate ? target.dueDate.slice(0, 10) : "",
       note: target.note ?? "",
+      projectId: target.projectId ?? "",
     };
   }, [dialog, tasks]);
 
   const buildQuery = useCallback(
-    (cat: string, withDone: boolean) => {
+    (cat: string, withDone: boolean, proj: string) => {
       const params = new URLSearchParams();
       if (cat) params.set("categoryId", cat);
+      if (proj) params.set("projectId", proj);
       if (!withDone) params.set("includeDone", "false");
       const qs = params.toString();
       return qs ? `?${qs}` : "";
@@ -62,8 +79,8 @@ export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
   );
 
   const refresh = useCallback(
-    async (cat = categoryFilter, withDone = showDone) => {
-      const res = await fetch(`/api/tasks${buildQuery(cat, withDone)}`, {
+    async (cat = categoryFilter, withDone = showDone, proj = projectFilter) => {
+      const res = await fetch(`/api/tasks${buildQuery(cat, withDone, proj)}`, {
         cache: "no-store",
       });
       if (!res.ok) {
@@ -72,7 +89,7 @@ export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
       const data = (await res.json()) as { tasks: TaskDTO[] };
       setTasks(data.tasks);
     },
-    [buildQuery, categoryFilter, showDone]
+    [buildQuery, categoryFilter, showDone, projectFilter]
   );
 
   const openAdd = useCallback(() => {
@@ -101,6 +118,7 @@ export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
           categoryId: value.categoryId,
           dueDate: value.dueDate === "" ? null : value.dueDate,
           note: value.note === "" ? null : value.note,
+          projectId: value.projectId === "" ? null : value.projectId,
         };
         if (dialog.mode === "add") {
           const res = await fetch("/api/tasks", {
@@ -212,14 +230,14 @@ export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
       setCategoryFilter(cat);
       setPageError(null);
       try {
-        await refresh(cat, showDone);
+        await refresh(cat, showDone, projectFilter);
       } catch (e) {
         setPageError(
           e instanceof Error ? e.message : "絞り込みに失敗しました"
         );
       }
     },
-    [refresh, showDone]
+    [refresh, showDone, projectFilter]
   );
 
   const handleToggleShowDone = useCallback(async () => {
@@ -227,14 +245,55 @@ export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
     setShowDone(next);
     setPageError(null);
     try {
-      await refresh(categoryFilter, next);
+      await refresh(categoryFilter, next, projectFilter);
     } catch (e) {
       setPageError(e instanceof Error ? e.message : "表示切替に失敗しました");
     }
-  }, [refresh, showDone, categoryFilter]);
+  }, [refresh, showDone, categoryFilter, projectFilter]);
+
+  const handleClearProjectFilter = useCallback(async () => {
+    setProjectFilter("");
+    setPageError(null);
+    try {
+      await refresh(categoryFilter, showDone, "");
+    } catch (e) {
+      setPageError(e instanceof Error ? e.message : "絞り込み解除に失敗しました");
+    }
+  }, [refresh, categoryFilter, showDone]);
+
+  const projectFilterName =
+    projectFilter
+      ? projects.find((p) => p.id === projectFilter)?.name ??
+        initialProjectName ??
+        null
+      : null;
 
   return (
     <div className="flex flex-col gap-4">
+      {/* プロジェクト絞り込みバナー */}
+      {projectFilter ? (
+        <div
+          data-testid="task-project-filter-banner"
+          className="flex flex-wrap items-center justify-between gap-2 rounded-[8px] border-whisper bg-[color:var(--accent-bg)] px-3 py-2"
+        >
+          <span className="text-[13px] text-ink">
+            プロジェクト「
+            <span className="font-semibold" data-testid="task-project-filter-name">
+              {projectFilterName ?? "（不明）"}
+            </span>
+            」で絞り込み中
+          </span>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => void handleClearProjectFilter()}
+            data-testid="task-project-filter-clear"
+          >
+            絞り込みを解除
+          </Button>
+        </div>
+      ) : null}
+
       {/* ツールバー: 絞り込み + 完了トグル + 追加 */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -309,6 +368,7 @@ export function TaskManager({ initialTasks, categories }: TaskManagerProps) {
         open={dialog.mode !== "closed"}
         mode={dialog.mode === "edit" ? "edit" : "add"}
         categories={categories}
+        projects={projects}
         initial={editingInitial}
         busy={dialogBusy}
         errorMessage={dialogError}

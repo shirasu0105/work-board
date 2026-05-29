@@ -13,7 +13,7 @@
       "Bash(echo \"PID: $!\")",
       "Read(//mnt/c/work/AIWork/**)",
       "Bash(echo \"Background PID: $!\")",
-      "Bash(git mv *)"
+      "Bash(npx cross-env *)"
     ]
   },
   "enableAllProjectMcpServers": true,

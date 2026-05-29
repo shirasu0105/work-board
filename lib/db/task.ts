@@ -50,6 +50,8 @@ function toDTO(t: TaskWithRelations): TaskDTO {
 export type ListTasksFilter = {
   /** カテゴリで絞り込む。未指定なら全件。 */
   categoryId?: string;
+  /** プロジェクトで絞り込む。未指定なら全件。 */
+  projectId?: string;
   /** false のとき完了タスクを除外する。デフォルトは true（含める）。 */
   includeDone?: boolean;
 };
@@ -65,6 +67,9 @@ export async function listTasks(
   const where: Prisma.TaskWhereInput = {};
   if (filter.categoryId) {
     where.categoryId = filter.categoryId;
+  }
+  if (filter.projectId) {
+    where.projectId = filter.projectId;
   }
   if (filter.includeDone === false) {
     where.status = { not: "done" };
