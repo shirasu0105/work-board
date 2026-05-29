@@ -1,0 +1,141 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary "グローバルナビゲーション" [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: //
+          - generic [ref=e7]: work-board
+        - paragraph [ref=e8]: 仕事効率化Webアプリ
+      - navigation "メインナビゲーション" [ref=e9]:
+        - list [ref=e10]:
+          - listitem [ref=e11]:
+            - link "ホーム" [ref=e12] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e13]: ▦
+              - generic [ref=e14]: ホーム
+          - listitem [ref=e15]:
+            - link "Inbox" [ref=e16] [cursor=pointer]:
+              - /url: /inbox
+              - generic [ref=e17]: ✉
+              - generic [ref=e18]: Inbox
+          - listitem [ref=e19]:
+            - link "タスク" [ref=e20] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=e21]: ✓
+              - generic [ref=e22]: タスク
+          - listitem [ref=e23]:
+            - link "プロジェクト" [ref=e24] [cursor=pointer]:
+              - /url: /projects
+              - generic [ref=e25]: ◷
+              - generic [ref=e26]: プロジェクト
+          - listitem [ref=e27]:
+            - link "メモ" [ref=e28] [cursor=pointer]:
+              - /url: /memos
+              - generic [ref=e29]: ✎
+              - generic [ref=e30]: メモ
+          - listitem [ref=e31]:
+            - link "日次ジャーナル" [ref=e32] [cursor=pointer]:
+              - /url: /journal
+              - generic [ref=e33]: ☾
+              - generic [ref=e34]: 日次ジャーナル
+          - listitem [ref=e35]:
+            - link "週次レビュー" [ref=e36] [cursor=pointer]:
+              - /url: /review
+              - generic [ref=e37]: ↻
+              - generic [ref=e38]: 週次レビュー
+          - listitem [ref=e39]:
+            - link "設定" [ref=e40] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e41]: ⚙
+              - generic [ref=e42]: 設定
+    - generic [ref=e43]:
+      - banner [ref=e44]:
+        - generic [ref=e45]:
+          - heading "設定" [level=1] [ref=e46]
+          - paragraph [ref=e47]: 初期 MVP の設定対象はカテゴリ管理のみ
+      - main [ref=e48]:
+        - generic [ref=e50]:
+          - complementary "設定メニュー" [ref=e51]:
+            - generic [ref=e52]: カテゴリ管理
+            - generic [ref=e53]: 表示設定（後で）
+            - generic [ref=e54]: バックアップ（後で）
+            - generic [ref=e55]: データエクスポート（後で）
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - generic [ref=e59]:
+                - heading "カテゴリ管理" [level=2] [ref=e60]
+                - paragraph [ref=e61]: タスク・プロジェクト・メモを分類するための大枠を管理します。
+              - button "＋ カテゴリを追加" [ref=e62]
+            - table "カテゴリ一覧" [ref=e63]:
+              - row "並び替え カテゴリ名 説明 表示 操作" [ref=e64]:
+                - columnheader "並び替え" [ref=e65]
+                - columnheader "カテゴリ名" [ref=e66]
+                - columnheader "説明" [ref=e67]
+                - columnheader "表示" [ref=e68]
+                - columnheader "操作" [ref=e69]
+              - list [ref=e70]:
+                - row "「テーマA改」を上へ移動 「テーマA改」を下へ移動 テーマA改 現業の主担当領域 「テーマA改」の表示を切り替える OFF 「テーマA改」を編集" [ref=e71]:
+                  - cell "「テーマA改」を上へ移動 「テーマA改」を下へ移動" [ref=e72]:
+                    - button "「テーマA改」を上へ移動" [disabled] [ref=e73]: ↑
+                    - button "「テーマA改」を下へ移動" [ref=e74]: ↓
+                  - cell "テーマA改" [ref=e75]
+                  - cell "現業の主担当領域" [ref=e76]
+                  - cell "「テーマA改」の表示を切り替える OFF" [ref=e77]:
+                    - switch "「テーマA改」の表示を切り替える" [ref=e78]:
+                      - generic [ref=e80]: "OFF"
+                    - generic [ref=e81]: "OFF"
+                  - cell "「テーマA改」を編集" [ref=e82]:
+                    - button "「テーマA改」を編集" [ref=e83]: 編集
+                - row "「カテゴリ3」を上へ移動 「カテゴリ3」を下へ移動 カテゴリ3 — 「カテゴリ3」の表示を切り替える 「カテゴリ3」を編集" [ref=e84]:
+                  - cell "「カテゴリ3」を上へ移動 「カテゴリ3」を下へ移動" [ref=e85]:
+                    - button "「カテゴリ3」を上へ移動" [ref=e86]: ↑
+                    - button "「カテゴリ3」を下へ移動" [ref=e87]: ↓
+                  - cell "カテゴリ3" [ref=e88]
+                  - cell "—" [ref=e89]
+                  - cell "「カテゴリ3」の表示を切り替える" [ref=e90]:
+                    - switch "「カテゴリ3」の表示を切り替える" [checked] [ref=e91]:
+                      - generic [ref=e93]: "ON"
+                  - cell "「カテゴリ3」を編集" [ref=e94]:
+                    - button "「カテゴリ3」を編集" [ref=e95]: 編集
+                - row "「カテゴリ1」を上へ移動 「カテゴリ1」を下へ移動 カテゴリ1 — 「カテゴリ1」の表示を切り替える 「カテゴリ1」を編集" [ref=e96]:
+                  - cell "「カテゴリ1」を上へ移動 「カテゴリ1」を下へ移動" [ref=e97]:
+                    - button "「カテゴリ1」を上へ移動" [ref=e98]: ↑
+                    - button "「カテゴリ1」を下へ移動" [ref=e99]: ↓
+                  - cell "カテゴリ1" [ref=e100]
+                  - cell "—" [ref=e101]
+                  - cell "「カテゴリ1」の表示を切り替える" [ref=e102]:
+                    - switch "「カテゴリ1」の表示を切り替える" [checked] [ref=e103]:
+                      - generic [ref=e105]: "ON"
+                  - cell "「カテゴリ1」を編集" [ref=e106]:
+                    - button "「カテゴリ1」を編集" [ref=e107]: 編集
+                - row "「カテゴリ2」を上へ移動 「カテゴリ2」を下へ移動 カテゴリ2 — 「カテゴリ2」の表示を切り替える 「カテゴリ2」を編集" [ref=e108]:
+                  - cell "「カテゴリ2」を上へ移動 「カテゴリ2」を下へ移動" [ref=e109]:
+                    - button "「カテゴリ2」を上へ移動" [ref=e110]: ↑
+                    - button "「カテゴリ2」を下へ移動" [disabled] [ref=e111]: ↓
+                  - cell "カテゴリ2" [ref=e112]
+                  - cell "—" [ref=e113]
+                  - cell "「カテゴリ2」の表示を切り替える" [ref=e114]:
+                    - switch "「カテゴリ2」の表示を切り替える" [checked] [ref=e115]:
+                      - generic [ref=e117]: "ON"
+                  - cell "「カテゴリ2」を編集" [ref=e118]:
+                    - button "「カテゴリ2」を編集" [ref=e119]: 編集
+            - dialog "カテゴリを追加" [ref=e130]:
+              - generic [ref=e131]:
+                - generic [ref=e132]:
+                  - heading "カテゴリを追加" [level=2] [ref=e133]
+                  - button "閉じる" [ref=e134]: ×
+                - generic [ref=e135]:
+                  - generic [ref=e136]:
+                    - generic [ref=e137]: カテゴリ名*
+                    - textbox "カテゴリ名*" [active] [ref=e138]:
+                      - /placeholder: "例: テーマA"
+                  - generic [ref=e139]:
+                    - generic [ref=e140]: 説明（任意）
+                    - textbox "説明（任意）" [ref=e141]:
+                      - /placeholder: このカテゴリで管理する内容を簡潔に
+                - generic [ref=e142]:
+                  - button "キャンセル" [ref=e143]
+                  - button "追加する" [disabled] [ref=e144]
+  - button "Open Next.js Dev Tools" [ref=e125] [cursor=pointer]:
+    - img [ref=e126]
+  - alert [ref=e129]

@@ -1,0 +1,199 @@
+// work-board MVP データモデル
+//
+// 設計方針:
+// - SQLite 1 ファイル運用（個人利用・ローカル起動）
+// - 今フェーズ（Phase 2）で実使用するのは Category のみ
+// - 他テーブルは後続フェーズ（Task / Inbox / Project / Memo / Journal / Waiting / Someday）の土台として最小スキーマを宣言
+// - SQLite は enum を持たないので status / kind 等は String 列で表現し、TS 側 const で値を制約
+// - 日時はすべて UTC 保存（@default(now()) / @updatedAt）
+// - 関連 (relation) は SetNull / Cascade を用途に応じて指定し、カテゴリ削除等の波及範囲を明示
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Category（Phase 2 実装対象）
+// ---------------------------------------------------------------------------
+model Category {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  projects      Project[]
+  tasks         Task[]
+  memos         Memo[]
+  somedayItems  SomedayItem[]
+
+  @@index([displayOrder])
+}
+
+// ---------------------------------------------------------------------------
+// Project（Phase 4 で実装予定）
+// ---------------------------------------------------------------------------
+model Project {
+  id            String    @id @default(cuid())
+  name          String
+  purpose       String?
+  completion    String?   // 完了条件
+  dueDate       DateTime?
+  status        String    @default("active") // active / done / paused
+  displayOrder  Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  tasks Task[]
+  memos Memo[]
+
+  @@index([categoryId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Task（Phase 3 で実装予定）
+// ---------------------------------------------------------------------------
+model Task {
+  id           String    @id @default(cuid())
+  title        String
+  note         String?
+  dueDate      DateTime?
+  status       String    @default("todo") // todo / doing / waiting / paused / done
+  displayOrder Int       @default(0)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  // 待ち状態詳細（Phase 5 で利用、1:1）
+  waitingState WaitingState?
+
+  // 日次ジャーナルで「明日やる」選択された記録
+  journalSelections JournalSelection[]
+
+  @@index([categoryId])
+  @@index([projectId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Memo（Phase 6 で実装予定）
+// ---------------------------------------------------------------------------
+model Memo {
+  id        String   @id @default(cuid())
+  title     String
+  kind      String   // meeting / tt / idea / research / worklog
+  // 種別別フォーマットの内容を JSON 文字列として格納
+  body      String   @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([categoryId])
+  @@index([projectId])
+  @@index([kind])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// InboxItem（Phase 4 で実装予定）
+// ---------------------------------------------------------------------------
+model InboxItem {
+  id        String   @id @default(cuid())
+  content   String
+  status    String   @default("pending") // pending / processed / deleted
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  processedAt DateTime?
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// SomedayItem（Phase 4 で実装予定・簡易）
+// ---------------------------------------------------------------------------
+model SomedayItem {
+  id        String    @id @default(cuid())
+  content   String
+  reason    String?
+  reviewAt  DateTime?
+  status    String    @default("open") // open / promoted / dropped
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([categoryId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// WaitingState（Phase 5 で実装予定・Task と 1:1）
+// ---------------------------------------------------------------------------
+model WaitingState {
+  id          String    @id @default(cuid())
+  partner     String    // 待ち相手
+  reason      String    // 待ち理由
+  reviewAt    DateTime? // 確認予定日
+  requestNote String?   // 依頼メモ
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  replyNote   String?
+  updatedAt   DateTime  @updatedAt
+
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([endedAt])
+}
+
+// ---------------------------------------------------------------------------
+// DailyJournal（Phase 7 で実装予定）
+// ---------------------------------------------------------------------------
+model DailyJournal {
+  id        String   @id @default(cuid())
+  // 対象日（YYYY-MM-DD の 00:00 UTC）
+  targetDate DateTime @unique
+  oneLiner  String   // 今日のひとこと
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  selections JournalSelection[]
+}
+
+// 「明日やること」選択（DailyJournal と Task の中間テーブル）
+model JournalSelection {
+  id        String   @id @default(cuid())
+  journalId String
+  taskId    String
+  createdAt DateTime @default(now())
+
+  journal DailyJournal @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  task    Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([journalId, taskId])
+  @@index([taskId])
+}
