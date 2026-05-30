@@ -9,6 +9,7 @@ import {
 } from "@/lib/types/task";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
+import { EmptyState } from "@/components/common/EmptyState";
 import { StatusBadge } from "./StatusBadge";
 
 export type TaskListProps = {
@@ -20,6 +21,10 @@ export type TaskListProps = {
   onDelete: (id: string) => void;
   /** 待ち解除アクション（待ち中タスクのみ表示） */
   onReleaseWaiting?: (id: string) => void;
+  /** 空状態からの「＋ タスク追加」導線（任意） */
+  onAdd?: () => void;
+  /** 絞り込み適用中フラグ（空状態の文言切り替え用） */
+  filtered?: boolean;
 };
 
 /**
@@ -35,20 +40,36 @@ export function TaskList({
   onEdit,
   onDelete,
   onReleaseWaiting,
+  onAdd,
+  filtered = false,
 }: TaskListProps) {
   if (tasks.length === 0) {
     return (
-      <div
+      <EmptyState
         data-testid="task-empty"
-        className={cn(
-          "rounded-[12px] border-whisper bg-paper px-6 py-10 text-center"
-        )}
-      >
-        <p className="text-[14px] text-ink">タスクがまだありません。</p>
-        <p className="mt-1 text-[12px] text-ink-2">
-          右上の「＋ タスク追加」から作成してください。
-        </p>
-      </div>
+        icon="✓"
+        title={
+          filtered
+            ? "条件に合うタスクがありません。"
+            : "タスクがまだありません。"
+        }
+        description={
+          filtered
+            ? "絞り込み条件を変えるか解除してください。"
+            : "「＋ タスク追加」から最初のタスクを作成しましょう。"
+        }
+        action={
+          !filtered && onAdd ? (
+            <Button
+              variant="primary"
+              onClick={onAdd}
+              data-testid="task-empty-add"
+            >
+              ＋ タスク追加
+            </Button>
+          ) : null
+        }
+      />
     );
   }
 

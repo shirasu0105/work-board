@@ -6,6 +6,7 @@ import {
 } from "@/lib/db/inbox";
 import { createTask } from "@/lib/db/task";
 import { createProject } from "@/lib/db/project";
+import { createSomedayItem } from "@/lib/db/someday";
 import { isInboxConvertTarget } from "@/lib/types/inbox";
 
 /**
@@ -14,7 +15,7 @@ import { isInboxConvertTarget } from "@/lib/types/inbox";
  *
  * - target="task"    : payload { categoryId, dueDate?, note? } でタスクを作成し Inbox を processed に
  * - target="project" : payload { categoryId, completion?, dueDate?, purpose? } でプロジェクトを作成し Inbox を processed に
- * - target="someday" : Inbox 項目を archived にして一覧から外す（Someday 簡易実装）
+ * - target="someday" : payload { categoryId, reason? } で SomedayItem を作成し Inbox を archived に（Someday 簡易実装）
  *
  * いずれも作成成功後に Inbox 項目を物理削除せず status 変更し、未整理一覧から確実に外す。
  */
@@ -92,9 +93,18 @@ export async function POST(request: Request, context: RouteContext) {
       return NextResponse.json({ project: created, item }, { status: 201 });
     }
 
-    // target === "someday"
+    // target === "someday": SomedayItem を作成してから Inbox を archived に
+    const categoryId = body.categoryId;
+    if (typeof categoryId !== "string" || categoryId.trim() === "") {
+      return NextResponse.json({ error: "カテゴリは必須です" }, { status: 400 });
+    }
+    const someday = await createSomedayItem({
+      content: inbox.content,
+      categoryId,
+      reason: optionalText(body.reason),
+    });
     const item = await markInboxArchived(id);
-    return NextResponse.json({ item });
+    return NextResponse.json({ someday, item }, { status: 201 });
   } catch (error) {
     return errorResponse(error);
   }

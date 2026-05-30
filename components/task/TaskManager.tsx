@@ -8,6 +8,11 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { TaskList } from "./TaskList";
 import { TaskKanban } from "./TaskKanban";
+import {
+  TaskFilters,
+  type ProjectPresence,
+  type TaskFiltersValue,
+} from "./TaskFilters";
 import { TaskFormDialog, type TaskFormValue } from "./TaskFormDialog";
 import {
   WaitingStartDialog,
@@ -76,8 +81,13 @@ export function TaskManager({
   const [waitingBusy, setWaitingBusy] = useState(false);
 
   // フィルタ条件
+  // カテゴリ・完了表示はサーバー絞り込み（再フェッチ）、
+  // ステータス・プロジェクト有無はクライアント側で表示中タスクを絞る。
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [showDone, setShowDone] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<TaskStatus | "">("");
+  const [projectPresence, setProjectPresence] =
+    useState<ProjectPresence>("any");
   // プロジェクト絞り込み（URL 由来。解除可能）
   const [projectFilter, setProjectFilter] = useState<string>(initialProjectId);
 
@@ -364,31 +374,57 @@ export function TaskManager({
     [refresh, tasks]
   );
 
-  const handleCategoryFilter = useCallback(
-    async (cat: string) => {
-      setCategoryFilter(cat);
-      setPageError(null);
-      try {
-        await refresh(cat, showDone, projectFilter);
-      } catch (e) {
-        setPageError(
-          e instanceof Error ? e.message : "絞り込みに失敗しました"
-        );
+  // フィルタ UI からの変更ハンドラ。
+  // カテゴリ・完了表示が変わったときはサーバー再フェッチ、
+  // ステータス・プロジェクト有無はクライアント絞り込みのみ（再フェッチ不要）。
+  const handleFiltersChange = useCallback(
+    async (next: TaskFiltersValue) => {
+      const catChanged = next.categoryId !== categoryFilter;
+      const showDoneChanged = next.showDone !== showDone;
+
+      setCategoryFilter(next.categoryId);
+      setShowDone(next.showDone);
+      setStatusFilter(next.status);
+      setProjectPresence(next.projectPresence);
+
+      if (catChanged || showDoneChanged) {
+        setPageError(null);
+        try {
+          await refresh(next.categoryId, next.showDone, projectFilter);
+        } catch (e) {
+          setPageError(
+            e instanceof Error ? e.message : "絞り込みに失敗しました"
+          );
+        }
       }
     },
-    [refresh, showDone, projectFilter]
+    [refresh, categoryFilter, showDone, projectFilter]
   );
 
-  const handleToggleShowDone = useCallback(async () => {
-    const next = !showDone;
-    setShowDone(next);
-    setPageError(null);
-    try {
-      await refresh(categoryFilter, next, projectFilter);
-    } catch (e) {
-      setPageError(e instanceof Error ? e.message : "表示切替に失敗しました");
-    }
-  }, [refresh, showDone, categoryFilter, projectFilter]);
+  // クライアント側フィルタ（ステータス・プロジェクト有無）を適用した表示用タスク。
+  const visibleTasks = useMemo(() => {
+    return tasks.filter((t) => {
+      if (statusFilter && t.status !== statusFilter) return false;
+      if (projectPresence === "with" && !t.projectId) return false;
+      if (projectPresence === "without" && t.projectId) return false;
+      return true;
+    });
+  }, [tasks, statusFilter, projectPresence]);
+
+  // 絞り込みが 1 つでも有効か（空状態の文言切替・件数表示に使う）。
+  const isFiltered =
+    categoryFilter !== "" ||
+    statusFilter !== "" ||
+    projectPresence !== "any" ||
+    !showDone ||
+    projectFilter !== "";
+
+  const filtersValue: TaskFiltersValue = {
+    categoryId: categoryFilter,
+    status: statusFilter,
+    projectPresence,
+    showDone,
+  };
 
   const handleClearProjectFilter = useCallback(async () => {
     setProjectFilter("");
@@ -436,43 +472,16 @@ export function TaskManager({
       {/* ツールバー: 絞り込み + 完了トグル + 追加 */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 text-[12px] text-ink-2">
-            カテゴリ
-            <select
-              value={categoryFilter}
-              onChange={(e) => void handleCategoryFilter(e.target.value)}
-              data-testid="task-filter-category"
-              className={cn(
-                "rounded-[4px] border border-[color:var(--border-whisper)] bg-paper px-2 py-1",
-                "text-[13px] text-ink",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-focus"
-              )}
-            >
-              <option value="">すべて</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <TaskFilters
+            categories={categories}
+            value={filtersValue}
+            onChange={(next) => void handleFiltersChange(next)}
+          />
 
-          <label className="flex items-center gap-2 text-[12px] text-ink-2">
-            <input
-              type="checkbox"
-              checked={showDone}
-              onChange={() => void handleToggleShowDone()}
-              data-testid="task-filter-showdone"
-              className="h-4 w-4 accent-[color:var(--accent)] cursor-pointer"
-            />
-            完了タスクを表示
-          </label>
-
-          <span
-            data-testid="task-count"
-            className="text-[12px] text-ink-3"
-          >
-            {tasks.length} 件
+          <span data-testid="task-count" className="text-[12px] text-ink-3">
+            {isFiltered
+              ? `${visibleTasks.length} 件 / 計 ${tasks.length} 件`
+              : `${tasks.length} 件`}
           </span>
         </div>
 
@@ -535,17 +544,19 @@ export function TaskManager({
 
       {view === "kanban" ? (
         <div className="overflow-x-auto pb-2">
-          <TaskKanban tasks={tasks} busyId={rowBusyId} onEdit={openEdit} />
+          <TaskKanban tasks={visibleTasks} busyId={rowBusyId} onEdit={openEdit} />
         </div>
       ) : (
         <TaskList
-          tasks={tasks}
+          tasks={visibleTasks}
           busyId={rowBusyId}
           onToggleComplete={handleToggleComplete}
           onChangeStatus={handleChangeStatus}
           onEdit={openEdit}
           onDelete={handleDelete}
           onReleaseWaiting={openReleaseWaiting}
+          onAdd={openAdd}
+          filtered={isFiltered}
         />
       )}
 

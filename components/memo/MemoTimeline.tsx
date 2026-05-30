@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Chip } from "@/components/ui/Chip";
+import { EmptyState } from "@/components/common/EmptyState";
 import { cn } from "@/lib/cn";
 import type { CategoryDTO } from "@/lib/db/category";
 import { formatLocalDate } from "@/lib/date";
@@ -13,8 +14,12 @@ import {
   MEMO_KIND_LABELS,
   MEMO_KIND_ORDER,
   type MemoDTO,
-  type MemoKind,
 } from "@/lib/types/memo";
+import {
+  EMPTY_MEMO_FILTERS,
+  MemoFilters,
+  type MemoFiltersValue,
+} from "./MemoFilters";
 
 export type MemoTimelineProps = {
   initialMemos: MemoDTO[];
@@ -24,64 +29,16 @@ export type MemoTimelineProps = {
 /**
  * メモ一覧（タイムライン）。createdAt 降順で時系列に並べる（要件書 §10.8）。
  *
- * 各行に: 日付 / タイトル / 種別バッジ / カテゴリチップ / 関連プロジェクト（あれば）。
- * 種別・カテゴリでの簡易絞り込みと、種別別カウントの集計を備える。
+ * 全件をクライアントで保持し、キーワード（タイトル部分一致）・カテゴリ・種別・
+ * 日付範囲(from/to) の 4 条件で AND 絞り込みする（要件書 §10.10 簡易実装）。
+ * 削除のみサーバーへ反映し、その後ローカル state からも除去する。
  */
 export function MemoTimeline({ initialMemos, categories }: MemoTimelineProps) {
   const router = useRouter();
   const [memos, setMemos] = useState<MemoDTO[]>(initialMemos);
-  const [kindFilter, setKindFilter] = useState<MemoKind | "">("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [filters, setFilters] = useState<MemoFiltersValue>(EMPTY_MEMO_FILTERS);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const buildQuery = useCallback((kind: MemoKind | "", cat: string) => {
-    const params = new URLSearchParams();
-    if (kind) params.set("kind", kind);
-    if (cat) params.set("categoryId", cat);
-    const qs = params.toString();
-    return qs ? `?${qs}` : "";
-  }, []);
-
-  const refresh = useCallback(
-    async (kind = kindFilter, cat = categoryFilter) => {
-      const res = await fetch(`/api/memos${buildQuery(kind, cat)}`, {
-        cache: "no-store",
-      });
-      if (!res.ok) {
-        throw new Error("メモ一覧の取得に失敗しました");
-      }
-      const data = (await res.json()) as { memos: MemoDTO[] };
-      setMemos(data.memos);
-    },
-    [buildQuery, kindFilter, categoryFilter]
-  );
-
-  const handleKindFilter = useCallback(
-    async (kind: MemoKind | "") => {
-      setKindFilter(kind);
-      setError(null);
-      try {
-        await refresh(kind, categoryFilter);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "絞り込みに失敗しました");
-      }
-    },
-    [refresh, categoryFilter]
-  );
-
-  const handleCategoryFilter = useCallback(
-    async (cat: string) => {
-      setCategoryFilter(cat);
-      setError(null);
-      try {
-        await refresh(kindFilter, cat);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "絞り込みに失敗しました");
-      }
-    },
-    [refresh, kindFilter]
-  );
 
   const handleDelete = useCallback(
     async (memo: MemoDTO) => {
@@ -97,7 +54,7 @@ export function MemoTimeline({ initialMemos, categories }: MemoTimelineProps) {
           const data = await safeJson(res);
           throw new Error(data?.error ?? "削除に失敗しました");
         }
-        await refresh();
+        setMemos((prev) => prev.filter((m) => m.id !== memo.id));
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "削除に失敗しました");
@@ -105,77 +62,67 @@ export function MemoTimeline({ initialMemos, categories }: MemoTimelineProps) {
         setBusyId(null);
       }
     },
-    [refresh, router]
+    [router]
   );
 
-  // 種別別カウント（フィルタ前の全件ではなく、現在表示中のメモを集計）
+  // フィルタ適用後のメモ（AND 条件）。
+  const visibleMemos = useMemo(() => {
+    const kw = filters.keyword.trim().toLowerCase();
+    // 日付範囲はローカル暦日の境界で判定する。
+    const fromTime = filters.from
+      ? new Date(`${filters.from}T00:00:00`).getTime()
+      : null;
+    const toTime = filters.to
+      ? new Date(`${filters.to}T23:59:59.999`).getTime()
+      : null;
+
+    return memos.filter((m) => {
+      if (kw && !m.title.toLowerCase().includes(kw)) return false;
+      if (filters.categoryId && m.categoryId !== filters.categoryId)
+        return false;
+      if (filters.kind && m.kind !== filters.kind) return false;
+      if (fromTime !== null || toTime !== null) {
+        const created = new Date(m.createdAt).getTime();
+        if (fromTime !== null && created < fromTime) return false;
+        if (toTime !== null && created > toTime) return false;
+      }
+      return true;
+    });
+  }, [memos, filters]);
+
+  const isFiltered =
+    filters.keyword.trim() !== "" ||
+    filters.categoryId !== "" ||
+    filters.kind !== "" ||
+    filters.from !== "" ||
+    filters.to !== "";
+
+  // 種別別カウント（現在表示中のメモを集計）。
   const kindCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const m of memos) {
+    for (const m of visibleMemos) {
       counts[m.kind] = (counts[m.kind] ?? 0) + 1;
     }
     return counts;
-  }, [memos]);
+  }, [visibleMemos]);
 
   return (
     <div className="flex flex-col gap-4">
-      {/* ツールバー */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 text-[12px] text-ink-2">
-            種別
-            <select
-              value={kindFilter}
-              onChange={(e) =>
-                void handleKindFilter(e.target.value as MemoKind | "")
-              }
-              data-testid="memo-filter-kind"
-              className={cn(
-                "rounded-[4px] border border-[color:var(--border-whisper)] bg-paper px-2 py-1",
-                "text-[13px] text-ink",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-focus"
-              )}
-            >
-              <option value="">すべて</option>
-              {MEMO_KIND_ORDER.map((k) => (
-                <option key={k} value={k}>
-                  {MEMO_KIND_LABELS[k]}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex items-center gap-2 text-[12px] text-ink-2">
-            カテゴリ
-            <select
-              value={categoryFilter}
-              onChange={(e) => void handleCategoryFilter(e.target.value)}
-              data-testid="memo-filter-category"
-              className={cn(
-                "rounded-[4px] border border-[color:var(--border-whisper)] bg-paper px-2 py-1",
-                "text-[13px] text-ink",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-focus"
-              )}
-            >
-              <option value="">すべて</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <span data-testid="memo-count" className="text-[12px] text-ink-3">
-            {memos.length} 件
-          </span>
+      {/* ツールバー: 検索・絞り込み + 新規導線 */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <MemoFilters
+            categories={categories}
+            value={filters}
+            onChange={setFilters}
+          />
         </div>
 
         <Link
           href="/memos/new"
           data-testid="memo-new-link"
           className={cn(
-            "inline-flex items-center justify-center gap-1.5 rounded-[4px] px-4 py-2 text-[14px] font-medium transition-colors",
+            "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-[4px] px-4 py-2 text-[14px] font-medium transition-colors",
             "bg-accent text-paper hover:bg-accent-hover",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-focus"
           )}
@@ -184,12 +131,17 @@ export function MemoTimeline({ initialMemos, categories }: MemoTimelineProps) {
         </Link>
       </div>
 
+      <div className="flex items-center justify-between gap-3">
+        <span data-testid="memo-count" className="text-[12px] text-ink-3">
+          {isFiltered
+            ? `${visibleMemos.length} 件 / 計 ${memos.length} 件`
+            : `${memos.length} 件`}
+        </span>
+      </div>
+
       {/* 種別別カウント（簡易集計） */}
-      {memos.length > 0 ? (
-        <div
-          className="flex flex-wrap gap-1.5"
-          data-testid="memo-kind-counts"
-        >
+      {visibleMemos.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5" data-testid="memo-kind-counts">
           {MEMO_KIND_ORDER.filter((k) => kindCounts[k]).map((k) => (
             <Chip key={k}>
               {MEMO_KIND_LABELS[k]}
@@ -209,19 +161,39 @@ export function MemoTimeline({ initialMemos, categories }: MemoTimelineProps) {
       ) : null}
 
       {/* タイムライン本体 */}
-      {memos.length === 0 ? (
-        <div
+      {visibleMemos.length === 0 ? (
+        <EmptyState
           data-testid="memo-empty"
-          className="rounded-[12px] border-whisper bg-paper px-6 py-10 text-center"
-        >
-          <p className="text-[14px] text-ink-2">まだメモがありません。</p>
-          <p className="mt-1 text-[12px] text-ink-3">
-            「＋ メモを書く」から最初のメモを記録しましょう。
-          </p>
-        </div>
+          icon="✎"
+          title={
+            isFiltered
+              ? "条件に合うメモがありません。"
+              : "まだメモがありません。"
+          }
+          description={
+            isFiltered
+              ? "検索条件を変えるか解除してください。"
+              : "「＋ メモを書く」から最初のメモを記録しましょう。"
+          }
+          action={
+            !isFiltered ? (
+              <Link
+                href="/memos/new"
+                data-testid="memo-empty-new"
+                className={cn(
+                  "inline-flex items-center justify-center gap-1.5 rounded-[4px] px-4 py-2 text-[14px] font-medium transition-colors",
+                  "bg-accent text-paper hover:bg-accent-hover",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-focus"
+                )}
+              >
+                ＋ メモを書く
+              </Link>
+            ) : null
+          }
+        />
       ) : (
         <ol data-testid="memo-timeline" className="flex flex-col gap-2">
-          {memos.map((memo) => (
+          {visibleMemos.map((memo) => (
             <li key={memo.id} data-testid="memo-row" data-memo-id={memo.id}>
               <div className="flex items-start gap-3 rounded-[12px] border-whisper bg-paper px-4 py-3 shadow-card">
                 {/* 日付（左カラム） */}

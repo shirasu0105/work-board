@@ -1,0 +1,178 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary "グローバルナビゲーション" [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: //
+          - generic [ref=e7]: work-board
+        - paragraph [ref=e8]: 仕事効率化Webアプリ
+      - navigation "メインナビゲーション" [ref=e9]:
+        - list [ref=e10]:
+          - listitem [ref=e11]:
+            - link "ホーム" [ref=e12] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e13]: ▦
+              - generic [ref=e14]: ホーム
+          - listitem [ref=e15]:
+            - link "Inbox" [ref=e16] [cursor=pointer]:
+              - /url: /inbox
+              - generic [ref=e17]: ✉
+              - generic [ref=e18]: Inbox
+          - listitem [ref=e19]:
+            - link "タスク" [ref=e20] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=e21]: ✓
+              - generic [ref=e22]: タスク
+          - listitem [ref=e23]:
+            - link "待ちタスク" [ref=e24] [cursor=pointer]:
+              - /url: /tasks/waiting
+              - generic [ref=e25]: ⏳
+              - generic [ref=e26]: 待ちタスク
+          - listitem [ref=e27]:
+            - link "プロジェクト" [ref=e28] [cursor=pointer]:
+              - /url: /projects
+              - generic [ref=e29]: ◷
+              - generic [ref=e30]: プロジェクト
+          - listitem [ref=e31]:
+            - link "メモ" [ref=e32] [cursor=pointer]:
+              - /url: /memos
+              - generic [ref=e33]: ✎
+              - generic [ref=e34]: メモ
+          - listitem [ref=e35]:
+            - link "日次ジャーナル" [ref=e36] [cursor=pointer]:
+              - /url: /journal
+              - generic [ref=e37]: ☾
+              - generic [ref=e38]: 日次ジャーナル
+          - listitem [ref=e39]:
+            - link "週次レビュー" [ref=e40] [cursor=pointer]:
+              - /url: /review
+              - generic [ref=e41]: ↻
+              - generic [ref=e42]: 週次レビュー
+          - listitem [ref=e43]:
+            - link "設定" [ref=e44] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e45]: ⚙
+              - generic [ref=e46]: 設定
+    - generic [ref=e47]:
+      - banner [ref=e48]:
+        - generic [ref=e49]:
+          - heading "タスク" [level=1] [ref=e50]
+          - paragraph [ref=e51]: カテゴリ・プロジェクト・ステータスでタスクを管理する
+      - main [ref=e52]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - generic [ref=e58]:
+                  - text: カテゴリ
+                  - combobox "カテゴリ" [ref=e59]:
+                    - option "すべて" [selected]
+                    - option "テーマA"
+                    - option "テーマB"
+                    - option "個人開発"
+                - generic [ref=e60]:
+                  - text: ステータス
+                  - combobox "ステータス" [ref=e61]:
+                    - option "すべて"
+                    - option "未着手" [selected]
+                    - option "対応中"
+                    - option "待ち"
+                    - option "保留"
+                    - option "完了"
+                - generic [ref=e62]:
+                  - text: プロジェクト
+                  - combobox "プロジェクト" [ref=e63]:
+                    - option "問わない" [selected]
+                    - option "プロジェクトありのみ"
+                    - option "プロジェクトなしのみ"
+                - generic [ref=e64]:
+                  - checkbox "完了タスクを表示" [checked] [ref=e65] [cursor=pointer]
+                  - text: 完了タスクを表示
+              - generic [ref=e66]: 5 件 / 計 10 件
+            - generic [ref=e67]:
+              - group "表示切替" [ref=e68]:
+                - button "リスト" [pressed] [ref=e69]
+                - button "かんばん" [ref=e70]
+              - button "＋ タスク追加" [ref=e71]
+          - table "タスク一覧" [ref=e72]:
+            - list [ref=e73]:
+              - listitem [ref=e94]:
+                - checkbox "「レビューを実施する」を完了にする" [ref=e95] [cursor=pointer]
+                - generic "レビューを実施する" [ref=e96]
+                - generic [ref=e97]: テーマA
+                - generic [ref=e98]: 年間計画化
+                - generic [ref=e99]: 未着手
+                - generic [ref=e100]: 「レビューを実施する」のステータス
+                - combobox "「レビューを実施する」のステータスを変更" [ref=e101]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e102]:
+                  - button "「レビューを実施する」を編集" [ref=e103]: 編集
+                  - button "「レビューを実施する」を削除" [ref=e104]: 削除
+              - listitem [ref=e119]:
+                - checkbox "「昨日が確認予定日のタスク」を完了にする" [ref=e120] [cursor=pointer]
+                - generic "昨日が確認予定日のタスク" [ref=e121]
+                - generic [ref=e122]: テーマA
+                - generic [ref=e123]: 未着手
+                - generic [ref=e124]: 「昨日が確認予定日のタスク」のステータス
+                - combobox "「昨日が確認予定日のタスク」のステータスを変更" [ref=e125]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e126]:
+                  - button "「昨日が確認予定日のタスク」を編集" [ref=e127]: 編集
+                  - button "「昨日が確認予定日のタスク」を削除" [ref=e128]: 削除
+              - listitem [ref=e129]:
+                - checkbox "「昨日が確認予定日のタスク」を完了にする" [ref=e130] [cursor=pointer]
+                - generic "昨日が確認予定日のタスク" [ref=e131]
+                - generic [ref=e132]: テーマA
+                - generic [ref=e133]: 未着手
+                - generic [ref=e134]: 「昨日が確認予定日のタスク」のステータス
+                - combobox "「昨日が確認予定日のタスク」のステータスを変更" [ref=e135]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e136]:
+                  - button "「昨日が確認予定日のタスク」を編集" [ref=e137]: 編集
+                  - button "「昨日が確認予定日のタスク」を削除" [ref=e138]: 削除
+              - listitem [ref=e139]:
+                - checkbox "「来週が確認予定日のタスク」を完了にする" [ref=e140] [cursor=pointer]
+                - generic "来週が確認予定日のタスク" [ref=e141]
+                - generic [ref=e142]: テーマA
+                - generic [ref=e143]: 未着手
+                - generic [ref=e144]: 「来週が確認予定日のタスク」のステータス
+                - combobox "「来週が確認予定日のタスク」のステータスを変更" [ref=e145]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e146]:
+                  - button "「来週が確認予定日のタスク」を編集" [ref=e147]: 編集
+                  - button "「来週が確認予定日のタスク」を削除" [ref=e148]: 削除
+              - listitem [ref=e177]:
+                - checkbox "「BIOS バージョン確認」を完了にする" [ref=e178] [cursor=pointer]
+                - generic "BIOS バージョン確認" [ref=e179]
+                - generic [ref=e180]: テーマA
+                - generic [ref=e181]: BIOSバージョン確認プロジェクト
+                - generic [ref=e182]: 未着手
+                - generic [ref=e183]: 「BIOS バージョン確認」のステータス
+                - combobox "「BIOS バージョン確認」のステータスを変更" [ref=e184]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e185]:
+                  - button "「BIOS バージョン確認」を編集" [ref=e186]: 編集
+                  - button "「BIOS バージョン確認」を削除" [ref=e187]: 削除
+  - button "Open Next.js Dev Tools" [ref=e214] [cursor=pointer]:
+    - img [ref=e215]
+  - alert [ref=e218]

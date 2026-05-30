@@ -12,6 +12,10 @@ import {
   ProjectFormDialog,
   type ProjectFormValue,
 } from "@/components/project/ProjectFormDialog";
+import {
+  SomedayFormDialog,
+  type SomedayFormValue,
+} from "@/components/someday/SomedayFormDialog";
 import { QuickAddBar } from "./QuickAddBar";
 import { InboxList } from "./InboxList";
 
@@ -23,7 +27,8 @@ export type InboxManagerProps = {
 type ConvertDialog =
   | { mode: "closed" }
   | { mode: "task"; itemId: string; content: string }
-  | { mode: "project"; itemId: string; content: string };
+  | { mode: "project"; itemId: string; content: string }
+  | { mode: "someday"; itemId: string; content: string };
 
 /**
  * Inbox ページの状態管理コンテナ（要件書 §10.2）。
@@ -105,31 +110,15 @@ export function InboxManager({ initialItems, categories }: InboxManagerProps) {
     [items, refresh]
   );
 
-  const handleSomeday = useCallback(
-    async (id: string) => {
-      setRowBusyId(id);
-      setPageError(null);
-      try {
-        const res = await fetch(
-          `/api/inbox/${encodeURIComponent(id)}/convert`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ target: "someday" }),
-          }
-        );
-        if (!res.ok) {
-          const data = await safeJson(res);
-          throw new Error(data?.error ?? "Someday 化に失敗しました");
-        }
-        await refresh();
-      } catch (e) {
-        setPageError(e instanceof Error ? e.message : "Someday 化に失敗しました");
-      } finally {
-        setRowBusyId(null);
-      }
+  // Someday 化はカテゴリ必須（要件 §10.7.3）のためダイアログを開く
+  const openSomeday = useCallback(
+    (id: string) => {
+      const it = items.find((i) => i.id === id);
+      if (!it) return;
+      setDialogError(null);
+      setConvert({ mode: "someday", itemId: id, content: it.content });
     },
-    [refresh]
+    [items]
   );
 
   // 内容を持たせてタスク化フォームを開く
@@ -233,6 +222,41 @@ export function InboxManager({ initialItems, categories }: InboxManagerProps) {
     [convert, refresh, router]
   );
 
+  const submitSomedayConvert = useCallback(
+    async (value: SomedayFormValue) => {
+      if (convert.mode !== "someday") return;
+      setDialogBusy(true);
+      setDialogError(null);
+      try {
+        const res = await fetch(
+          `/api/inbox/${encodeURIComponent(convert.itemId)}/convert`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              target: "someday",
+              categoryId: value.categoryId,
+              reason: value.reason === "" ? null : value.reason,
+            }),
+          }
+        );
+        if (!res.ok) {
+          const data = await safeJson(res);
+          throw new Error(data?.error ?? "Someday 化に失敗しました");
+        }
+        await refresh();
+        setConvert({ mode: "closed" });
+      } catch (e) {
+        setDialogError(
+          e instanceof Error ? e.message : "Someday 化に失敗しました"
+        );
+      } finally {
+        setDialogBusy(false);
+      }
+    },
+    [convert, refresh]
+  );
+
   const taskInitial = useMemo<TaskFormValue | undefined>(() => {
     if (convert.mode !== "task") return undefined;
     return {
@@ -253,6 +277,15 @@ export function InboxManager({ initialItems, categories }: InboxManagerProps) {
       dueDate: "",
       purpose: "",
       status: "active",
+    };
+  }, [convert, categories]);
+
+  const somedayInitial = useMemo<SomedayFormValue | undefined>(() => {
+    if (convert.mode !== "someday") return undefined;
+    return {
+      content: convert.content,
+      categoryId: categories[0]?.id ?? "",
+      reason: "",
     };
   }, [convert, categories]);
 
@@ -280,7 +313,7 @@ export function InboxManager({ initialItems, categories }: InboxManagerProps) {
         busyId={rowBusyId}
         onConvertTask={openTask}
         onConvertProject={openProject}
-        onSomeday={(id) => void handleSomeday(id)}
+        onSomeday={openSomeday}
         onDelete={(id) => void handleDelete(id)}
       />
 
@@ -307,6 +340,18 @@ export function InboxManager({ initialItems, categories }: InboxManagerProps) {
         errorMessage={dialogError}
         onCancel={closeConvert}
         onSubmit={submitProjectConvert}
+      />
+
+      <SomedayFormDialog
+        open={convert.mode === "someday"}
+        categories={categories}
+        initial={somedayInitial}
+        lockContent
+        title="Someday に追加"
+        busy={dialogBusy}
+        errorMessage={dialogError}
+        onCancel={closeConvert}
+        onSubmit={submitSomedayConvert}
       />
     </div>
   );
