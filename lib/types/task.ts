@@ -56,4 +56,16 @@ export type TaskDTO = {
   categoryName: string;
   projectId: string | null;
   projectName: string | null;
+  /**
+   * 現在待ち中の場合の待ち情報（Phase 5）。
+   * status === "waiting" かつ未解除の WaitingState があるときのみ非 null。
+   */
+  waiting: {
+    partner: string;
+    reason: string;
+    reviewAt: string | null;
+    startedAt: string;
+    /** startedAt から本日までの暦日差（システム TZ 基準） */
+    waitingDays: number;
+  } | null;
 };

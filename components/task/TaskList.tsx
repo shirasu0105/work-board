@@ -18,6 +18,8 @@ export type TaskListProps = {
   onChangeStatus: (id: string, status: TaskStatus) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  /** 待ち解除アクション（待ち中タスクのみ表示） */
+  onReleaseWaiting?: (id: string) => void;
 };
 
 /**
@@ -32,6 +34,7 @@ export function TaskList({
   onChangeStatus,
   onEdit,
   onDelete,
+  onReleaseWaiting,
 }: TaskListProps) {
   if (tasks.length === 0) {
     return (
@@ -118,6 +121,24 @@ export function TaskList({
                 </span>
               ) : null}
 
+              {/* 待ち情報（待ち中のみ）: 待ち相手と待ち日数 */}
+              {t.waiting ? (
+                <span
+                  data-testid="task-waiting-info"
+                  className="inline-flex items-center gap-1 whitespace-nowrap text-[12px] text-[color:var(--warning)]"
+                >
+                  <span data-testid="task-waiting-partner">
+                    {t.waiting.partner} 待ち
+                  </span>
+                  <span
+                    data-testid="task-waiting-days"
+                    className="rounded-full bg-[#fdecd9] px-1.5 py-0.5 text-[11px] font-semibold leading-none"
+                  >
+                    {t.waiting.waitingDays} 日
+                  </span>
+                </span>
+              ) : null}
+
               {/* ステータスバッジ */}
               <StatusBadge status={t.status} />
 
@@ -150,6 +171,18 @@ export function TaskList({
 
               {/* 操作 */}
               <div className="flex items-center gap-1">
+                {t.status === "waiting" && onReleaseWaiting ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    aria-label={`「${t.title}」の待ちを解除`}
+                    disabled={isBusy}
+                    onClick={() => onReleaseWaiting(t.id)}
+                    data-testid="task-release-waiting-button"
+                  >
+                    待ち解除
+                  </Button>
+                ) : null}
                 <Button
                   size="sm"
                   variant="secondary"

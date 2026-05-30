@@ -7,7 +7,18 @@ import type { ProjectOption } from "./TaskFormDialog";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { TaskList } from "./TaskList";
+import { TaskKanban } from "./TaskKanban";
 import { TaskFormDialog, type TaskFormValue } from "./TaskFormDialog";
+import {
+  WaitingStartDialog,
+  type WaitingStartValue,
+} from "./WaitingStartDialog";
+import {
+  WaitingReleaseDialog,
+  type WaitingReleaseValue,
+} from "./WaitingReleaseDialog";
+
+type ViewMode = "list" | "kanban";
 
 export type TaskManagerProps = {
   initialTasks: TaskDTO[];
@@ -18,12 +29,19 @@ export type TaskManagerProps = {
   initialProjectId?: string;
   /** 絞り込み中プロジェクトの表示名（バナー用） */
   initialProjectName?: string;
+  /** 初期表示モード（?view=kanban で kanban） */
+  initialView?: ViewMode;
 };
 
 type DialogState =
   | { mode: "closed" }
   | { mode: "add" }
   | { mode: "edit"; taskId: string };
+
+type WaitingDialogState =
+  | { mode: "closed" }
+  | { mode: "start"; taskId: string }
+  | { mode: "release"; taskId: string };
 
 /**
  * タスク一覧ページの状態管理コンテナ。
@@ -38,6 +56,7 @@ export function TaskManager({
   projects,
   initialProjectId = "",
   initialProjectName,
+  initialView = "list",
 }: TaskManagerProps) {
   const [tasks, setTasks] = useState<TaskDTO[]>(initialTasks);
   const [dialog, setDialog] = useState<DialogState>({ mode: "closed" });
@@ -45,6 +64,16 @@ export function TaskManager({
   const [dialogBusy, setDialogBusy] = useState(false);
   const [rowBusyId, setRowBusyId] = useState<string | null>(null);
   const [pageError, setPageError] = useState<string | null>(null);
+
+  // 表示モード（リスト / かんばん）
+  const [view, setView] = useState<ViewMode>(initialView);
+
+  // 待ち化・待ち解除ダイアログ
+  const [waitingDialog, setWaitingDialog] = useState<WaitingDialogState>({
+    mode: "closed",
+  });
+  const [waitingError, setWaitingError] = useState<string | null>(null);
+  const [waitingBusy, setWaitingBusy] = useState(false);
 
   // フィルタ条件
   const [categoryFilter, setCategoryFilter] = useState<string>("");
@@ -192,9 +221,119 @@ export function TaskManager({
 
   const handleChangeStatus = useCallback(
     (id: string, status: TaskStatus) => {
+      // 「待ち」へ変更しようとしたら待ち化フォームを開く（直接ステータス変更しない）
+      if (status === "waiting") {
+        setWaitingError(null);
+        setWaitingDialog({ mode: "start", taskId: id });
+        return;
+      }
       void patchStatus(id, status);
     },
     [patchStatus]
+  );
+
+  const openReleaseWaiting = useCallback((id: string) => {
+    setWaitingError(null);
+    setWaitingDialog({ mode: "release", taskId: id });
+  }, []);
+
+  const closeWaitingDialog = useCallback(() => {
+    if (waitingBusy) return;
+    setWaitingDialog({ mode: "closed" });
+    setWaitingError(null);
+  }, [waitingBusy]);
+
+  const submitWaitingStart = useCallback(
+    async (value: WaitingStartValue) => {
+      if (waitingDialog.mode !== "start") return;
+      const taskId = waitingDialog.taskId;
+      setWaitingBusy(true);
+      setWaitingError(null);
+      try {
+        const res = await fetch(
+          `/api/tasks/${encodeURIComponent(taskId)}/wait`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              partner: value.partner,
+              reason: value.reason,
+              reviewAt: value.reviewAt === "" ? null : value.reviewAt,
+              requestNote: value.requestNote === "" ? null : value.requestNote,
+            }),
+          }
+        );
+        if (!res.ok) {
+          const data = await safeJson(res);
+          throw new Error(data?.error ?? "待ち化に失敗しました");
+        }
+        await refresh();
+        setWaitingDialog({ mode: "closed" });
+      } catch (e) {
+        setWaitingError(
+          e instanceof Error ? e.message : "待ち化に失敗しました"
+        );
+      } finally {
+        setWaitingBusy(false);
+      }
+    },
+    [waitingDialog, refresh]
+  );
+
+  const submitWaitingRelease = useCallback(
+    async (value: WaitingReleaseValue) => {
+      if (waitingDialog.mode !== "release") return;
+      const taskId = waitingDialog.taskId;
+      setWaitingBusy(true);
+      setWaitingError(null);
+      try {
+        const res = await fetch(
+          `/api/tasks/${encodeURIComponent(taskId)}/wait`,
+          {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nextStatus: value.nextStatus,
+              replyNote: value.replyNote === "" ? null : value.replyNote,
+            }),
+          }
+        );
+        if (!res.ok) {
+          const data = await safeJson(res);
+          throw new Error(data?.error ?? "待ち解除に失敗しました");
+        }
+        await refresh();
+        setWaitingDialog({ mode: "closed" });
+      } catch (e) {
+        setWaitingError(
+          e instanceof Error ? e.message : "待ち解除に失敗しました"
+        );
+      } finally {
+        setWaitingBusy(false);
+      }
+    },
+    [waitingDialog, refresh]
+  );
+
+  const waitingTaskTitle = useMemo(() => {
+    if (waitingDialog.mode === "closed") return undefined;
+    return tasks.find((t) => t.id === waitingDialog.taskId)?.title;
+  }, [waitingDialog, tasks]);
+
+  const handleSwitchView = useCallback(
+    (next: ViewMode) => {
+      setView(next);
+      // URL クエリへ反映（リロードせず履歴のみ更新）
+      try {
+        const url = new URL(window.location.href);
+        if (next === "kanban") url.searchParams.set("view", "kanban");
+        else url.searchParams.delete("view");
+        window.history.replaceState(null, "", url.toString());
+      } catch {
+        // URL 更新失敗は致命的でないため握りつぶす
+      }
+    },
+    []
   );
 
   const handleDelete = useCallback(
@@ -337,13 +476,52 @@ export function TaskManager({
           </span>
         </div>
 
-        <Button
-          variant="primary"
-          onClick={openAdd}
-          data-testid="add-task-button"
-        >
-          ＋ タスク追加
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* 表示モード切替（リスト / かんばん） */}
+          <div
+            role="group"
+            aria-label="表示切替"
+            data-testid="task-view-toggle"
+            className="inline-flex overflow-hidden rounded-[4px] border-whisper"
+          >
+            <button
+              type="button"
+              onClick={() => handleSwitchView("list")}
+              aria-pressed={view === "list"}
+              data-testid="task-view-list"
+              className={cn(
+                "px-3 py-1 text-[13px] font-medium transition-colors",
+                view === "list"
+                  ? "bg-accent text-paper"
+                  : "bg-paper text-ink-2 hover:bg-paper-2"
+              )}
+            >
+              リスト
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSwitchView("kanban")}
+              aria-pressed={view === "kanban"}
+              data-testid="task-view-kanban"
+              className={cn(
+                "px-3 py-1 text-[13px] font-medium transition-colors border-l border-[color:var(--border-whisper)]",
+                view === "kanban"
+                  ? "bg-accent text-paper"
+                  : "bg-paper text-ink-2 hover:bg-paper-2"
+              )}
+            >
+              かんばん
+            </button>
+          </div>
+
+          <Button
+            variant="primary"
+            onClick={openAdd}
+            data-testid="add-task-button"
+          >
+            ＋ タスク追加
+          </Button>
+        </div>
       </div>
 
       {pageError ? (
@@ -355,13 +533,38 @@ export function TaskManager({
         </div>
       ) : null}
 
-      <TaskList
-        tasks={tasks}
-        busyId={rowBusyId}
-        onToggleComplete={handleToggleComplete}
-        onChangeStatus={handleChangeStatus}
-        onEdit={openEdit}
-        onDelete={handleDelete}
+      {view === "kanban" ? (
+        <div className="overflow-x-auto pb-2">
+          <TaskKanban tasks={tasks} busyId={rowBusyId} onEdit={openEdit} />
+        </div>
+      ) : (
+        <TaskList
+          tasks={tasks}
+          busyId={rowBusyId}
+          onToggleComplete={handleToggleComplete}
+          onChangeStatus={handleChangeStatus}
+          onEdit={openEdit}
+          onDelete={handleDelete}
+          onReleaseWaiting={openReleaseWaiting}
+        />
+      )}
+
+      <WaitingStartDialog
+        open={waitingDialog.mode === "start"}
+        taskTitle={waitingTaskTitle}
+        busy={waitingBusy}
+        errorMessage={waitingError}
+        onCancel={closeWaitingDialog}
+        onSubmit={submitWaitingStart}
+      />
+
+      <WaitingReleaseDialog
+        open={waitingDialog.mode === "release"}
+        taskTitle={waitingTaskTitle}
+        busy={waitingBusy}
+        errorMessage={waitingError}
+        onCancel={closeWaitingDialog}
+        onSubmit={submitWaitingRelease}
       />
 
       <TaskFormDialog

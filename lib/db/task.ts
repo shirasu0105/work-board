@@ -5,6 +5,7 @@ import {
   type TaskDTO,
   type TaskStatus,
 } from "@/lib/types/task";
+import { waitingDays } from "@/lib/date";
 
 /**
  * タスク CRUD のサーバー側関数群（Phase 3）。
@@ -21,21 +22,37 @@ type TaskWithRelations = Prisma.TaskGetPayload<{
   include: {
     category: { select: { name: true } };
     project: { select: { name: true } };
+    waitingState: true;
   };
 }>;
 
 const TASK_INCLUDE = {
   category: { select: { name: true } },
   project: { select: { name: true } },
+  waitingState: true,
 } as const;
 
 function toDTO(t: TaskWithRelations): TaskDTO {
+  const status: TaskStatus = isTaskStatus(t.status) ? t.status : "todo";
+  // 待ち中（status==="waiting" かつ未解除の WaitingState）のときだけ待ち情報を載せる
+  const w = t.waitingState;
+  const waiting =
+    status === "waiting" && w && w.endedAt === null
+      ? {
+          partner: w.partner,
+          reason: w.reason,
+          reviewAt: w.reviewAt ? w.reviewAt.toISOString() : null,
+          startedAt: w.startedAt.toISOString(),
+          waitingDays: waitingDays(w.startedAt),
+        }
+      : null;
+
   return {
     id: t.id,
     title: t.title,
     note: t.note,
     dueDate: t.dueDate ? t.dueDate.toISOString() : null,
-    status: isTaskStatus(t.status) ? t.status : "todo",
+    status,
     displayOrder: t.displayOrder,
     completedAt: t.completedAt ? t.completedAt.toISOString() : null,
     createdAt: t.createdAt.toISOString(),
@@ -44,6 +61,7 @@ function toDTO(t: TaskWithRelations): TaskDTO {
     categoryName: t.category.name,
     projectId: t.projectId,
     projectName: t.project?.name ?? null,
+    waiting,
   };
 }
 
@@ -176,6 +194,19 @@ export async function updateTask(
     throw new Error("該当タスクが見つかりません");
   }
 
+  // 待ち中タスクを「待ち」以外へ汎用更新で変えた場合、待ち状態を自動解除する。
+  // （専用の解除ダイアログを使わずステータスを切り替えたケースの整合性確保）
+  if (
+    current.status === "waiting" &&
+    input.status !== undefined &&
+    input.status !== "waiting"
+  ) {
+    await prisma.waitingState.updateMany({
+      where: { taskId: id, endedAt: null },
+      data: { endedAt: new Date() },
+    });
+  }
+
   const data: Prisma.TaskUpdateInput = {};
 
   if (typeof input.title === "string") {
@@ -219,6 +250,13 @@ export async function updateTask(
   if (input.status !== undefined) {
     if (!isTaskStatus(input.status)) {
       throw new Error("不正なステータスです");
+    }
+    // 「待ち」はサブ状態（待ち相手・理由が必須）なので、汎用更新では設定させない。
+    // 待ち化は /api/tasks/:id/wait（startWaiting）経由でのみ行う。
+    if (input.status === "waiting") {
+      throw new Error(
+        "「待ち」への変更は待ち化フォームから行ってください"
+      );
     }
     data.status = input.status;
     if (input.status === "done") {

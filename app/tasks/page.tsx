@@ -8,12 +8,14 @@ import { getProject, listProjects } from "@/lib/db/project";
 export const dynamic = "force-dynamic";
 
 type TasksPageProps = {
-  searchParams: Promise<{ projectId?: string }>;
+  searchParams: Promise<{ projectId?: string; view?: string }>;
 };
 
 export default async function TasksPage({ searchParams }: TasksPageProps) {
-  const { projectId: rawProjectId } = await searchParams;
+  const { projectId: rawProjectId, view: rawView } = await searchParams;
   const projectId = rawProjectId?.trim() || undefined;
+  const initialView: "list" | "kanban" =
+    rawView === "kanban" ? "kanban" : "list";
 
   const [initialTasks, allCategories, allProjects, filterProject] =
     await Promise.all([
@@ -39,6 +41,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
         projects={projectOptions}
         initialProjectId={filterProject ? filterProject.id : ""}
         initialProjectName={filterProject?.name}
+        initialView={initialView}
       />
     </PageShell>
   );

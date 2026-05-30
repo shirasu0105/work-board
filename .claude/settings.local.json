@@ -13,7 +13,8 @@
       "Bash(echo \"PID: $!\")",
       "Read(//mnt/c/work/AIWork/**)",
       "Bash(echo \"Background PID: $!\")",
-      "Bash(npx cross-env *)"
+      "Bash(npx cross-env *)",
+      "Bash(npx prisma *)"
     ]
   },
   "enableAllProjectMcpServers": true,
