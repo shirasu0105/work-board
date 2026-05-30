@@ -1,0 +1,52 @@
+
+> python-manager@0.1.0 dev
+> cross-env DATABASE_URL=file:./dev.db next dev
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://25.2.147.205:3000
+✓ Ready in 570ms
+
+ GET / 200 in 1791ms (next.js: 1636ms, application-code: 155ms)
+ GET /settings 200 in 810ms (next.js: 537ms, application-code: 274ms)
+ POST /api/categories 201 in 244ms (next.js: 220ms, application-code: 24ms)
+ GET /api/categories 200 in 13ms (next.js: 8ms, application-code: 5ms)
+ GET /settings 200 in 45ms (next.js: 6ms, application-code: 39ms)
+ PATCH /api/categories/cmpqy4jpd0000rhwg6qjdi251 200 in 760ms (next.js: 747ms, application-code: 13ms)
+ GET /api/categories 200 in 8ms (next.js: 3ms, application-code: 5ms)
+ PATCH /api/categories/cmpqy4jpd0000rhwg6qjdi251 200 in 21ms (next.js: 11ms, application-code: 10ms)
+ GET /api/categories 200 in 10ms (next.js: 3ms, application-code: 7ms)
+ POST /api/categories 201 in 15ms (next.js: 3ms, application-code: 12ms)
+ GET /api/categories 200 in 7ms (next.js: 2ms, application-code: 5ms)
+ POST /api/categories 201 in 16ms (next.js: 3ms, application-code: 13ms)
+ GET /api/categories 200 in 8ms (next.js: 2ms, application-code: 6ms)
+ POST /api/categories 201 in 11ms (next.js: 1607µs, application-code: 9ms)
+ GET /api/categories 200 in 5ms (next.js: 1545µs, application-code: 4ms)
+ POST /api/categories/reorder 200 in 100ms (next.js: 84ms, application-code: 17ms)
+ GET /api/categories 200 in 5ms (next.js: 1767µs, application-code: 4ms)
+ POST /api/categories/reorder 200 in 15ms (next.js: 1461µs, application-code: 14ms)
+ GET /api/categories 200 in 6ms (next.js: 2ms, application-code: 4ms)
+ GET /settings 200 in 68ms (next.js: 3ms, application-code: 64ms)
+ GET /review 200 in 330ms (next.js: 303ms, application-code: 26ms)
+ GET /journal 200 in 262ms (next.js: 245ms, application-code: 17ms)
+ GET /memos 200 in 252ms (next.js: 223ms, application-code: 29ms)
+ GET /settings 200 in 23ms (next.js: 3ms, application-code: 20ms)
+ PATCH /api/categories/cmpqy6lyq0003rhwgzyfdk2u1 200 in 22ms (next.js: 11ms, application-code: 11ms)
+ GET /api/categories 200 in 7ms (next.js: 2ms, application-code: 5ms)
+ PATCH /api/categories/cmpqy626j0001rhwgbhvro2tj 200 in 13ms (next.js: 3ms, application-code: 9ms)
+ GET /api/categories 200 in 5ms (next.js: 1627µs, application-code: 4ms)
+ PATCH /api/categories/cmpqy6bh90002rhwg9q5xmkih 200 in 20ms (next.js: 11ms, application-code: 10ms)
+ GET /api/categories 200 in 7ms (next.js: 1984µs, application-code: 5ms)
+ PATCH /api/categories/cmpqy6bh90002rhwg9q5xmkih 200 in 23ms (next.js: 14ms, application-code: 9ms)
+ GET /api/categories 200 in 6ms (next.js: 2ms, application-code: 4ms)
+ PATCH /api/categories/cmpqy6lyq0003rhwgzyfdk2u1 200 in 15ms (next.js: 4ms, application-code: 11ms)
+ GET /api/categories 200 in 7ms (next.js: 2ms, application-code: 5ms)
+ PATCH /api/categories/cmpqy626j0001rhwgbhvro2tj 200 in 19ms (next.js: 10ms, application-code: 9ms)
+ GET /api/categories 200 in 7ms (next.js: 1551µs, application-code: 6ms)
+ PATCH /api/categories/cmpqy4jpd0000rhwg6qjdi251 200 in 11ms (next.js: 2ms, application-code: 9ms)
+ GET /api/categories 200 in 8ms (next.js: 4ms, application-code: 4ms)
+ POST /api/categories/reorder 200 in 16ms (next.js: 2ms, application-code: 14ms)
+ GET /api/categories 200 in 8ms (next.js: 4ms, application-code: 5ms)
+ POST /api/categories/reorder 200 in 15ms (next.js: 1875µs, application-code: 13ms)
+ GET /api/categories 200 in 6ms (next.js: 2ms, application-code: 4ms)
+[?25h

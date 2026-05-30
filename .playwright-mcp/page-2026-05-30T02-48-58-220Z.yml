@@ -1,0 +1,181 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary "グローバルナビゲーション" [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: //
+          - generic [ref=e7]: work-board
+        - paragraph [ref=e8]: 仕事効率化Webアプリ
+      - navigation "メインナビゲーション" [ref=e9]:
+        - list [ref=e10]:
+          - listitem [ref=e11]:
+            - link "ホーム" [ref=e12] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e13]: ▦
+              - generic [ref=e14]: ホーム
+          - listitem [ref=e15]:
+            - link "Inbox" [ref=e16] [cursor=pointer]:
+              - /url: /inbox
+              - generic [ref=e17]: ✉
+              - generic [ref=e18]: Inbox
+          - listitem [ref=e19]:
+            - link "タスク" [ref=e20] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=e21]: ✓
+              - generic [ref=e22]: タスク
+          - listitem [ref=e23]:
+            - link "待ちタスク" [ref=e24] [cursor=pointer]:
+              - /url: /tasks/waiting
+              - generic [ref=e25]: ⏳
+              - generic [ref=e26]: 待ちタスク
+          - listitem [ref=e27]:
+            - link "プロジェクト" [ref=e28] [cursor=pointer]:
+              - /url: /projects
+              - generic [ref=e29]: ◷
+              - generic [ref=e30]: プロジェクト
+          - listitem [ref=e31]:
+            - link "メモ" [ref=e32] [cursor=pointer]:
+              - /url: /memos
+              - generic [ref=e33]: ✎
+              - generic [ref=e34]: メモ
+          - listitem [ref=e35]:
+            - link "日次ジャーナル" [ref=e36] [cursor=pointer]:
+              - /url: /journal
+              - generic [ref=e37]: ☾
+              - generic [ref=e38]: 日次ジャーナル
+          - listitem [ref=e39]:
+            - link "週次レビュー" [ref=e40] [cursor=pointer]:
+              - /url: /review
+              - generic [ref=e41]: ↻
+              - generic [ref=e42]: 週次レビュー
+          - listitem [ref=e43]:
+            - link "設定" [ref=e44] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e45]: ⚙
+              - generic [ref=e46]: 設定
+    - generic [ref=e47]:
+      - banner [ref=e48]:
+        - generic [ref=e49]:
+          - heading "タスク" [level=1] [ref=e50]
+          - paragraph [ref=e51]: カテゴリ・プロジェクト・ステータスでタスクを管理する
+      - main [ref=e52]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - text: カテゴリ
+                - combobox "カテゴリ" [ref=e58]:
+                  - option "すべて" [selected]
+                  - option "テーマA"
+                  - option "テーマB"
+                  - option "個人開発"
+              - generic [ref=e59]:
+                - checkbox "完了タスクを表示" [checked] [ref=e60] [cursor=pointer]
+                - text: 完了タスクを表示
+              - generic [ref=e61]: 6 件
+            - generic [ref=e62]:
+              - group "表示切替" [ref=e63]:
+                - button "リスト" [pressed] [ref=e64]
+                - button "かんばん" [ref=e65]
+              - button "＋ タスク追加" [ref=e66]
+          - table "タスク一覧" [ref=e67]:
+            - list [ref=e68]:
+              - listitem [ref=e69]:
+                - checkbox "「〇〇さんへのヒアリング項目をまとめる」を完了にする" [ref=e70] [cursor=pointer]
+                - generic "〇〇さんへのヒアリング項目をまとめる" [ref=e71]
+                - generic [ref=e72]: テーマA
+                - generic [ref=e73]: 未着手
+                - generic [ref=e74]: 「〇〇さんへのヒアリング項目をまとめる」のステータス
+                - combobox "「〇〇さんへのヒアリング項目をまとめる」のステータスを変更" [ref=e75]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e76]:
+                  - button "「〇〇さんへのヒアリング項目をまとめる」を編集" [ref=e77]: 編集
+                  - button "「〇〇さんへのヒアリング項目をまとめる」を削除" [ref=e78]: 削除
+              - listitem [ref=e79]:
+                - checkbox "「資料を整理する」を完了にする" [ref=e80] [cursor=pointer]
+                - generic "資料を整理する" [ref=e81]
+                - generic [ref=e82]: テーマB
+                - generic [ref=e83]: 未着手
+                - generic [ref=e84]: 「資料を整理する」のステータス
+                - combobox "「資料を整理する」のステータスを変更" [ref=e85]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e86]:
+                  - button "「資料を整理する」を編集" [ref=e87]: 編集
+                  - button "「資料を整理する」を削除" [ref=e88]: 削除
+              - listitem [ref=e89]:
+                - checkbox "「Tailwind v4 を試す」を完了にする" [ref=e90] [cursor=pointer]
+                - generic "Tailwind v4 を試す" [ref=e91]
+                - generic [ref=e92]: 個人開発
+                - generic [ref=e93]: 未着手
+                - generic [ref=e94]: 「Tailwind v4 を試す」のステータス
+                - combobox "「Tailwind v4 を試す」のステータスを変更" [ref=e95]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e96]:
+                  - button "「Tailwind v4 を試す」を編集" [ref=e97]: 編集
+                  - button "「Tailwind v4 を試す」を削除" [ref=e98]: 削除
+              - listitem [ref=e99]:
+                - checkbox "「レビューを実施する」を完了にする" [ref=e100] [cursor=pointer]
+                - generic "レビューを実施する" [ref=e101]
+                - generic [ref=e102]: テーマA
+                - generic [ref=e103]: 年間計画化
+                - generic [ref=e104]: 未着手
+                - generic [ref=e105]: 「レビューを実施する」のステータス
+                - combobox "「レビューを実施する」のステータスを変更" [ref=e106]:
+                  - option "未着手" [selected]
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e107]:
+                  - button "「レビューを実施する」を編集" [ref=e108]: 編集
+                  - button "「レビューを実施する」を削除" [ref=e109]: 削除
+              - listitem [ref=e155]:
+                - checkbox "「対応表の確認回答待ち」を完了にする" [ref=e156] [cursor=pointer]
+                - generic "対応表の確認回答待ち" [ref=e157]
+                - generic [ref=e158]: テーマA
+                - generic [ref=e187]:
+                  - generic [ref=e188]: Aさん 待ち
+                  - generic [ref=e189]: 0 日
+                - generic [ref=e159]: 待ち
+                - generic [ref=e160]: 「対応表の確認回答待ち」のステータス
+                - combobox "「対応表の確認回答待ち」のステータスを変更" [ref=e161]:
+                  - option "未着手"
+                  - option "対応中"
+                  - option "待ち" [selected]
+                  - option "保留"
+                  - option "完了"
+                - generic [ref=e162]:
+                  - button "「対応表の確認回答待ち」の待ちを解除" [ref=e190]: 待ち解除
+                  - button "「対応表の確認回答待ち」を編集" [ref=e163]: 編集
+                  - button "「対応表の確認回答待ち」を削除" [ref=e164]: 削除
+              - listitem [ref=e110]:
+                - checkbox "「対応表の初稿を書く」を完了にする" [checked] [ref=e111] [cursor=pointer]
+                - generic "対応表の初稿を書く" [ref=e112]
+                - generic [ref=e113]: テーマA
+                - generic [ref=e114]: 年間計画化
+                - generic [ref=e115]: 完了
+                - generic [ref=e116]: 「対応表の初稿を書く」のステータス
+                - combobox "「対応表の初稿を書く」のステータスを変更" [ref=e117]:
+                  - option "未着手"
+                  - option "対応中"
+                  - option "待ち"
+                  - option "保留"
+                  - option "完了" [selected]
+                - generic [ref=e118]:
+                  - button "「対応表の初稿を書く」を編集" [ref=e119]: 編集
+                  - button "「対応表の初稿を書く」を削除" [ref=e120]: 削除
+  - button "Open Next.js Dev Tools" [ref=e126] [cursor=pointer]:
+    - img [ref=e127]
+  - alert [ref=e130]

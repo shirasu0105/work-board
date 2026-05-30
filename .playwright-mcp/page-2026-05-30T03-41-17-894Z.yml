@@ -1,0 +1,102 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary "グローバルナビゲーション" [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: //
+          - generic [ref=e7]: work-board
+        - paragraph [ref=e8]: 仕事効率化Webアプリ
+      - navigation "メインナビゲーション" [ref=e9]:
+        - list [ref=e10]:
+          - listitem [ref=e11]:
+            - link "ホーム" [ref=e12] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e13]: ▦
+              - generic [ref=e14]: ホーム
+          - listitem [ref=e15]:
+            - link "Inbox" [ref=e16] [cursor=pointer]:
+              - /url: /inbox
+              - generic [ref=e17]: ✉
+              - generic [ref=e18]: Inbox
+          - listitem [ref=e19]:
+            - link "タスク" [ref=e20] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=e21]: ✓
+              - generic [ref=e22]: タスク
+          - listitem [ref=e23]:
+            - link "待ちタスク" [ref=e24] [cursor=pointer]:
+              - /url: /tasks/waiting
+              - generic [ref=e25]: ⏳
+              - generic [ref=e26]: 待ちタスク
+          - listitem [ref=e27]:
+            - link "プロジェクト" [ref=e28] [cursor=pointer]:
+              - /url: /projects
+              - generic [ref=e29]: ◷
+              - generic [ref=e30]: プロジェクト
+          - listitem [ref=e31]:
+            - link "メモ" [ref=e32] [cursor=pointer]:
+              - /url: /memos
+              - generic [ref=e33]: ✎
+              - generic [ref=e34]: メモ
+          - listitem [ref=e35]:
+            - link "日次ジャーナル" [ref=e36] [cursor=pointer]:
+              - /url: /journal
+              - generic [ref=e37]: ☾
+              - generic [ref=e38]: 日次ジャーナル
+          - listitem [ref=e39]:
+            - link "週次レビュー" [ref=e40] [cursor=pointer]:
+              - /url: /review
+              - generic [ref=e41]: ↻
+              - generic [ref=e42]: 週次レビュー
+          - listitem [ref=e43]:
+            - link "設定" [ref=e44] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e45]: ⚙
+              - generic [ref=e46]: 設定
+    - generic [ref=e47]:
+      - banner [ref=e48]:
+        - generic [ref=e49]:
+          - heading "メモ" [level=1] [ref=e50]
+          - paragraph [ref=e51]: 議事録・TTメモ・思いつき・調査・作業ログを種別ごとに記録する
+      - main [ref=e52]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - text: 種別
+                - combobox "種別" [ref=e58]:
+                  - option "すべて" [selected]
+                  - option "議事録"
+                  - option "TTメモ"
+                  - option "思いつきメモ"
+                  - option "調査メモ"
+                  - option "作業ログ"
+              - generic [ref=e59]:
+                - text: カテゴリ
+                - combobox "カテゴリ" [ref=e60]:
+                  - option "すべて" [selected]
+                  - option "テーマA"
+                  - option "テーマB"
+                  - option "個人開発"
+              - generic [ref=e61]: 1 件
+            - link "＋ メモを書く" [ref=e62] [cursor=pointer]:
+              - /url: /memos/new
+          - generic [ref=e64]:
+            - text: 議事録
+            - generic [ref=e65]: "1"
+          - list [ref=e66]:
+            - listitem [ref=e67]:
+              - generic [ref=e68]:
+                - generic [ref=e69]: 2026/05/30
+                - generic [ref=e70]:
+                  - generic [ref=e71]:
+                    - generic [ref=e72]: 議事録
+                    - link "週次定例MTG" [ref=e73] [cursor=pointer]:
+                      - /url: /memos/cmprsxtxs0001rhlc3c2tl3nd
+                  - generic [ref=e75]: テーマA
+                - generic [ref=e76]:
+                  - link "編集" [ref=e77] [cursor=pointer]:
+                    - /url: /memos/cmprsxtxs0001rhlc3c2tl3nd
+                  - button "削除" [ref=e78]
+  - button "Open Next.js Dev Tools" [ref=e84] [cursor=pointer]:
+    - img [ref=e85]

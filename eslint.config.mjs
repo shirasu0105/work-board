@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Reference-only sketches; not part of the runtime app.
+    "docs/design-references/**",
   ]),
 ]);
 
