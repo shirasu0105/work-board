@@ -1,15 +1,28 @@
 import { PageShell } from "@/components/layout/PageShell";
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { MemoFormByKind } from "@/components/memo/MemoFormByKind";
+import { listCategories } from "@/lib/db/category";
+import { listProjects } from "@/lib/db/project";
 
-export default function MemoNewPage() {
+export const dynamic = "force-dynamic";
+
+export default async function MemoNewPage() {
+  const [allCategories, allProjects] = await Promise.all([
+    listCategories(),
+    listProjects(),
+  ]);
+
+  const activeCategories = allCategories.filter((c) => c.isActive);
+  const projectOptions = allProjects.map((p) => ({ id: p.id, name: p.name }));
+
   return (
     <PageShell
       title="メモを書く"
       subtitle="メモ種別を選択してフォーマット付きで新しいメモを作成する"
     >
-      <PagePlaceholder
-        description="議事録・TTメモ・思いつきメモ・調査メモ・作業ログから種別を選び、入力フォーマットを切り替えて記録します。"
-        note="Phase 1 時点では空状態のみ。Phase 6 でメモ種別の入力フォームを実装します。"
+      <MemoFormByKind
+        mode="create"
+        categories={activeCategories}
+        projects={projectOptions}
       />
     </PageShell>
   );

@@ -1,16 +1,26 @@
 import { PageShell } from "@/components/layout/PageShell";
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { MemoTimeline } from "@/components/memo/MemoTimeline";
+import { listCategories } from "@/lib/db/category";
+import { listMemos } from "@/lib/db/memo";
 
-export default function MemosPage() {
+// メモ一覧は常に最新を SSR で取得する
+export const dynamic = "force-dynamic";
+
+export default async function MemosPage() {
+  const [initialMemos, allCategories] = await Promise.all([
+    listMemos(),
+    listCategories(),
+  ]);
+
+  // 絞り込みで選べるのは有効なカテゴリのみ
+  const activeCategories = allCategories.filter((c) => c.isActive);
+
   return (
     <PageShell
       title="メモ"
       subtitle="議事録・TTメモ・思いつき・調査・作業ログを種別ごとに記録する"
     >
-      <PagePlaceholder
-        description="メモは種別ごとの入力フォーマットで記録し、後から検索できる形で保存します。"
-        note="Phase 1 時点では空状態のみ。Phase 6 でメモ種別の切替と一覧表示を実装します。"
-      />
+      <MemoTimeline initialMemos={initialMemos} categories={activeCategories} />
     </PageShell>
   );
 }

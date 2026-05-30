@@ -1,0 +1,115 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary "グローバルナビゲーション" [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: //
+          - generic [ref=e7]: work-board
+        - paragraph [ref=e8]: 仕事効率化Webアプリ
+      - navigation "メインナビゲーション" [ref=e9]:
+        - list [ref=e10]:
+          - listitem [ref=e11]:
+            - link "ホーム" [ref=e12] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e13]: ▦
+              - generic [ref=e14]: ホーム
+          - listitem [ref=e15]:
+            - link "Inbox" [ref=e16] [cursor=pointer]:
+              - /url: /inbox
+              - generic [ref=e17]: ✉
+              - generic [ref=e18]: Inbox
+          - listitem [ref=e19]:
+            - link "タスク" [ref=e20] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=e21]: ✓
+              - generic [ref=e22]: タスク
+          - listitem [ref=e23]:
+            - link "待ちタスク" [ref=e24] [cursor=pointer]:
+              - /url: /tasks/waiting
+              - generic [ref=e25]: ⏳
+              - generic [ref=e26]: 待ちタスク
+          - listitem [ref=e27]:
+            - link "プロジェクト" [ref=e28] [cursor=pointer]:
+              - /url: /projects
+              - generic [ref=e29]: ◷
+              - generic [ref=e30]: プロジェクト
+          - listitem [ref=e31]:
+            - link "メモ" [ref=e32] [cursor=pointer]:
+              - /url: /memos
+              - generic [ref=e33]: ✎
+              - generic [ref=e34]: メモ
+          - listitem [ref=e35]:
+            - link "日次ジャーナル" [ref=e36] [cursor=pointer]:
+              - /url: /journal
+              - generic [ref=e37]: ☾
+              - generic [ref=e38]: 日次ジャーナル
+          - listitem [ref=e39]:
+            - link "週次レビュー" [ref=e40] [cursor=pointer]:
+              - /url: /review
+              - generic [ref=e41]: ↻
+              - generic [ref=e42]: 週次レビュー
+          - listitem [ref=e43]:
+            - link "設定" [ref=e44] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e45]: ⚙
+              - generic [ref=e46]: 設定
+    - generic [ref=e47]:
+      - banner [ref=e48]:
+        - generic [ref=e49]:
+          - heading "メモを書く" [level=1] [ref=e50]
+          - paragraph [ref=e51]: メモ種別を選択してフォーマット付きで新しいメモを作成する
+      - main [ref=e52]:
+        - generic [ref=e54]:
+          - tablist "メモ種別" [ref=e55]:
+            - tab "議事録" [selected] [ref=e56]
+            - tab "TTメモ" [ref=e57]
+            - tab "思いつきメモ" [ref=e58]
+            - tab "調査メモ" [ref=e59]
+            - tab "作業ログ" [ref=e60]
+          - generic [ref=e61]:
+            - generic [ref=e62]:
+              - generic [ref=e63]:
+                - generic [ref=e64]: タイトル*
+                - textbox "タイトル*" [ref=e65]:
+                  - /placeholder: "例: 週次定例MTG"
+              - generic [ref=e66]:
+                - generic [ref=e67]:
+                  - generic [ref=e68]: カテゴリ*
+                  - combobox "カテゴリ*" [ref=e69]:
+                    - option "選択してください" [disabled]
+                    - option "テーマA" [selected]
+                    - option "テーマB"
+                    - option "個人開発"
+                - generic [ref=e70]:
+                  - generic [ref=e71]: 関連プロジェクト（任意）
+                  - combobox "関連プロジェクト（任意）" [ref=e72]:
+                    - option "なし" [selected]
+                    - option "年間計画化"
+            - generic [ref=e73]:
+              - paragraph [ref=e74]: 議事録フォーマット
+              - generic [ref=e75]:
+                - generic [ref=e76]: 日時
+                - textbox "日時" [ref=e77]
+              - generic [ref=e78]:
+                - generic [ref=e79]: 参加者
+                - textbox "参加者" [ref=e80]
+              - generic [ref=e81]:
+                - generic [ref=e82]: 目的
+                - textbox "目的" [ref=e83]
+              - generic [ref=e84]:
+                - generic [ref=e85]: 議題
+                - textbox "議題" [ref=e86]
+              - generic [ref=e87]:
+                - generic [ref=e88]: 決定事項
+                - textbox "決定事項" [ref=e89]
+              - generic [ref=e90]:
+                - generic [ref=e91]: 宿題
+                - textbox "宿題" [ref=e92]
+              - generic [ref=e93]:
+                - generic [ref=e94]: 自分のNext Action
+                - textbox "自分のNext Action" [ref=e95]
+          - generic [ref=e96]:
+            - button "キャンセル" [ref=e97]
+            - button "保存する" [disabled] [ref=e98]
+  - button "Open Next.js Dev Tools" [ref=e104] [cursor=pointer]:
+    - img [ref=e105]

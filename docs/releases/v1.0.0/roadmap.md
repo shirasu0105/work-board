@@ -29,12 +29,12 @@ created_at: 2026-05-28
 - [x] Phase 3: タスク管理（リスト CRUD＋ステータス）（[phase-3.md](./phase/phase-3.md)）
 - [x] Phase 4: Inbox とプロジェクト管理（[phase-4.md](./phase/phase-4.md)）
 - [x] Phase 5: 待ち状態管理とタスクかんばん表示（[phase-5.md](./phase/phase-5.md)）
-- [ ] Phase 6: メモ管理（種別フォーマット切替）（[phase-6.md](./phase/phase-6.md)）
+- [x] Phase 6: メモ管理（種別フォーマット切替）（[phase-6.md](./phase/phase-6.md)）
 - [ ] Phase 7: ホーム集約と日次ジャーナル（[phase-7.md](./phase/phase-7.md)）
 - [ ] Phase 8: 週次レビュー・検索/絞り込み・仕上げ（[phase-8.md](./phase/phase-8.md)）
 
-**現時点**: Phase 5 完了（待ち状態管理とタスクかんばん表示）
-**次の一手**: `/implement-phase 6`（メモ管理・種別フォーマット切替）
+**現時点**: Phase 6 完了（メモ管理・種別フォーマット切替）
+**次の一手**: `/implement-phase 7`（ホーム集約と日次ジャーナル）
 
 ## 想定する各フェーズ完了時の「触れる範囲」
 
