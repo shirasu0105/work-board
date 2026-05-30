@@ -1,0 +1,119 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary "グローバルナビゲーション" [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: //
+          - generic [ref=e7]: work-board
+        - paragraph [ref=e8]: 仕事効率化Webアプリ
+      - navigation "メインナビゲーション" [ref=e9]:
+        - list [ref=e10]:
+          - listitem [ref=e11]:
+            - link "ホーム" [ref=e12] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e13]: ▦
+              - generic [ref=e14]: ホーム
+          - listitem [ref=e15]:
+            - link "Inbox" [ref=e16] [cursor=pointer]:
+              - /url: /inbox
+              - generic [ref=e17]: ✉
+              - generic [ref=e18]: Inbox
+          - listitem [ref=e19]:
+            - link "タスク" [ref=e20] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=e21]: ✓
+              - generic [ref=e22]: タスク
+          - listitem [ref=e23]:
+            - link "待ちタスク" [ref=e24] [cursor=pointer]:
+              - /url: /tasks/waiting
+              - generic [ref=e25]: ⏳
+              - generic [ref=e26]: 待ちタスク
+          - listitem [ref=e27]:
+            - link "プロジェクト" [ref=e28] [cursor=pointer]:
+              - /url: /projects
+              - generic [ref=e29]: ◷
+              - generic [ref=e30]: プロジェクト
+          - listitem [ref=e31]:
+            - link "メモ" [ref=e32] [cursor=pointer]:
+              - /url: /memos
+              - generic [ref=e33]: ✎
+              - generic [ref=e34]: メモ
+          - listitem [ref=e35]:
+            - link "日次ジャーナル" [ref=e36] [cursor=pointer]:
+              - /url: /journal
+              - generic [ref=e37]: ☾
+              - generic [ref=e38]: 日次ジャーナル
+          - listitem [ref=e39]:
+            - link "週次レビュー" [ref=e40] [cursor=pointer]:
+              - /url: /review
+              - generic [ref=e41]: ↻
+              - generic [ref=e42]: 週次レビュー
+          - listitem [ref=e43]:
+            - link "設定" [ref=e44] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e45]: ⚙
+              - generic [ref=e46]: 設定
+    - generic [ref=e47]:
+      - banner [ref=e48]:
+        - generic [ref=e49]:
+          - heading "日次ジャーナル — 5/30 (土)" [level=1] [ref=e50]
+          - paragraph [ref=e51]: 今日のひとことを記録し、明日やることを選ぶ
+      - main [ref=e52]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: "対象日: 5/30 (土)"
+            - button "保存して明日を準備 →" [ref=e57]
+          - generic [ref=e58]:
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - heading "① 今日のひとこと*必須" [level=2] [ref=e61]
+                - paragraph [ref=e62]: 軽い振り返り。長く書かなくてよい。
+                - 'textbox "例: ヒアリング前の準備に時間がかかった。明日は朝イチで対応表を進める。" [ref=e63]': ヒアリング前の準備に時間がかかった
+              - generic [ref=e64]:
+                - heading "今日完了したタスク" [level=2] [ref=e65]
+                - paragraph [ref=e66]: 今日完了したタスクはありません
+            - generic [ref=e68]:
+              - generic [ref=e69]:
+                - heading "② 明日やること を選ぶ" [level=2] [ref=e70]
+                - paragraph [ref=e71]: 未完了タスクから、明日（5/31 (日)）に取り組むものを選びます。 選んだものは翌日ホームの「今日やること」に表示されます。
+              - list [ref=e72]:
+                - listitem [ref=e73]:
+                  - button "〇〇さんへのヒアリング項目をまとめる テーマA" [pressed] [ref=e74]:
+                    - checkbox [checked] [ref=e75]
+                    - generic [ref=e76]:
+                      - generic [ref=e77]: 〇〇さんへのヒアリング項目をまとめる
+                      - generic [ref=e79]: テーマA
+                - listitem [ref=e80]:
+                  - button "資料を整理する テーマB" [active] [pressed] [ref=e81]:
+                    - checkbox [checked] [ref=e82]
+                    - generic [ref=e83]:
+                      - generic [ref=e84]: 資料を整理する
+                      - generic [ref=e86]: テーマB
+                - listitem [ref=e87]:
+                  - button "Tailwind v4 を試す 個人開発" [ref=e88]:
+                    - checkbox [ref=e89]
+                    - generic [ref=e90]:
+                      - generic [ref=e91]: Tailwind v4 を試す
+                      - generic [ref=e93]: 個人開発
+                - listitem [ref=e94]:
+                  - button "レビューを実施する テーマA ▸ 年間計画化" [ref=e95]:
+                    - checkbox [ref=e96]
+                    - generic [ref=e97]:
+                      - generic [ref=e98]: レビューを実施する
+                      - generic [ref=e99]:
+                        - generic [ref=e100]: テーマA
+                        - generic [ref=e101]: ▸ 年間計画化
+                - listitem [ref=e102]:
+                  - button "対応表の確認回答待ち テーマA" [ref=e103]:
+                    - checkbox [ref=e104]
+                    - generic [ref=e105]:
+                      - generic [ref=e106]: 対応表の確認回答待ち
+                      - generic [ref=e108]: テーマA
+              - generic [ref=e109]:
+                - generic [ref=e110]:
+                  - text: "選択中:"
+                  - generic [ref=e111]: 2 件
+                - generic [ref=e112]: → 翌日ホームに表示
+  - button "Open Next.js Dev Tools" [ref=e118] [cursor=pointer]:
+    - img [ref=e119]
+  - alert [ref=e122]
