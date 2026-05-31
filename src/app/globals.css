@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+/* 手動テーマ切替（html.dark）を有効化する custom variant */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * デザイントークン（DESIGN.md を参考に light/dark 両対応で再整理）。
+ * セマンティック名で定義し、コンポーネントからは bg-surface / text-ink などで参照する。
+ */
+:root {
+  --color-canvas: #f7f8f8;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f2f4;
+  --color-surface-3: #e7e9ec;
+  --color-hairline: #e2e4e8;
+  --color-hairline-strong: #cdd0d6;
+
+  --color-ink: #1c1d21;
+  --color-ink-muted: #4b4f57;
+  --color-ink-subtle: #6a6f78;
+  --color-ink-tertiary: #9a9ea7;
+
+  --color-primary: #5e6ad2;
+  --color-primary-hover: #4d58c4;
+  --color-on-primary: #ffffff;
+
+  --color-success: #1f9d49;
+  --color-warning: #c2820a;
+  --color-danger: #d23f3f;
+
+  /* タスクステータス別アクセント */
+  --color-status-todo: #6a6f78;
+  --color-status-doing: #5e6ad2;
+  --color-status-waiting: #c2820a;
+  --color-status-hold: #9a6ad2;
+  --color-status-done: #1f9d49;
+}
+
+.dark {
+  --color-canvas: #010102;
+  --color-surface: #0f1011;
+  --color-surface-2: #141516;
+  --color-surface-3: #18191a;
+  --color-hairline: #23252a;
+  --color-hairline-strong: #34343a;
+
+  --color-ink: #f7f8f8;
+  --color-ink-muted: #d0d6e0;
+  --color-ink-subtle: #8a8f98;
+  --color-ink-tertiary: #62666d;
+
+  --color-primary: #5e6ad2;
+  --color-primary-hover: #828fff;
+  --color-on-primary: #ffffff;
+
+  --color-success: #27a644;
+  --color-warning: #d4a017;
+  --color-danger: #e26464;
+
+  --color-status-todo: #8a8f98;
+  --color-status-doing: #828fff;
+  --color-status-waiting: #d4a017;
+  --color-status-hold: #b18cff;
+  --color-status-done: #27a644;
+}
+
+/* @theme でトークンをユーティリティに公開（bg-canvas, text-ink, rounded-lg 等） */
+@theme inline {
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-surface-3: var(--color-surface-3);
+  --color-hairline: var(--color-hairline);
+  --color-hairline-strong: var(--color-hairline-strong);
+
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-ink-subtle: var(--color-ink-subtle);
+  --color-ink-tertiary: var(--color-ink-tertiary);
+
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-on-primary: var(--color-on-primary);
+
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+
+  --color-status-todo: var(--color-status-todo);
+  --color-status-doing: var(--color-status-doing);
+  --color-status-waiting: var(--color-status-waiting);
+  --color-status-hold: var(--color-status-hold);
+  --color-status-done: var(--color-status-done);
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  scrollbar-width: thin;
+}

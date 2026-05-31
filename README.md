@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# work-board
 
-## Getting Started
+仕事効率化Webアプリ（GTD風のタスク/プロジェクト/メモ管理）。ローカルPCのブラウザで動作する個人用ツール。
 
-First, run the development server:
+詳細仕様は `docs/SPEC.md`、要件は `docs/requirements.md` を参照。
+
+## 技術スタック
+
+- Next.js 16（App Router） / React 19 / TypeScript
+- Tailwind CSS v4（`@theme` トークン、ライト/ダーク両対応）
+- SQLite + Drizzle ORM（better-sqlite3） / drizzle-kit でマイグレーション
+- zod（Server Action 境界の入力検証） / @dnd-kit（ドラッグ&ドロップ）
+
+## アーキテクチャ概要
+
+- 読み取りは Server Components（`src/lib/queries/`）、書き込みは Server Actions（`src/lib/actions/`）。
+- 純粋なドメインロジックは `src/lib/domain/`（並び替えの再採番・日付計算など。ユニットテスト対象）。
+- UI は `src/components/ui`（汎用）/ `src/components/layout`（サイドバー・ヘッダー・テーマ）/ `src/components/<feature>`。
+- DB ファイルは `data/work-board.db`（`.gitignore` 済み）。
+
+## セットアップ・起動
 
 ```bash
+npm install
+
+# DB 初期化（マイグレーション適用 → サンプルデータ投入）
+npm run db:migrate
+npm run db:seed
+
+# 開発サーバ
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000` を開く。シード済みデータでホーム/タスク/プロジェクト/設定が確認できる。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### DB 関連スクリプト
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run db:generate` — `schema.ts` から SQL マイグレーションを生成
+- `npm run db:migrate` — マイグレーションを `data/work-board.db` に適用
+- `npm run db:seed` — サンプルデータ投入（既存データがある場合はスキップ）
 
-## Learn More
+## データのバックアップ（手動）
 
-To learn more about Next.js, take a look at the following resources:
+データは単一ファイル `data/work-board.db` に保存される。バックアップは開発サーバを停止した状態でこのファイルをコピーするだけでよい。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# 例: タイムスタンプ付きでコピー
+cp data/work-board.db "data/backup-$(date +%Y%m%d).db"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+復元はコピーしたファイルを `data/work-board.db` に戻す。
 
-## Deploy on Vercel
+## 実装状況
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`docs/SPEC.md` のマイルストーンに沿って段階的に構築中。現在 **M0〜M3**（基盤 / カテゴリ管理 / プロジェクト管理 / タスク管理リスト）まで実装済み。M4 以降（かんばん・待ち・Inbox・メモ・ジャーナル・レビュー・ホーム）は未着手で、該当画面は「準備中」表示。

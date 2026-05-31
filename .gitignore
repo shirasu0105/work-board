@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# sqlite data
+/data
+
+# local dev / test artifacts
+/dev.log
+/.playwright-mcp
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
