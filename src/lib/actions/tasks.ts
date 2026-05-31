@@ -6,6 +6,12 @@ import { db } from "@/lib/db";
 import { tasks } from "@/lib/db/schema";
 import { newId, nowIso } from "@/lib/id";
 import { taskInputSchema, type TaskInput } from "@/lib/validation/tasks";
+import {
+  waitingInputSchema,
+  waitingReleaseSchema,
+  type WaitingInput,
+  type WaitingReleaseInput,
+} from "@/lib/validation/waiting";
 import { formatZodError, type ActionResult } from "@/lib/validation/common";
 import { reassignDisplayOrder } from "@/lib/domain/reorder";
 import type { TaskStatus } from "@/lib/constants";
@@ -94,6 +100,64 @@ export async function setTaskStatus(
         status === "待ち" ? (current.waitingStartedAt ?? now) : current.waitingStartedAt,
       waitingEndedAt:
         current.status === "待ち" && status !== "待ち" ? now : current.waitingEndedAt,
+      updatedAt: now,
+    })
+    .where(eq(tasks.id, id))
+    .run();
+
+  revalidatePath("/tasks");
+  return { ok: true };
+}
+
+/**
+ * 待ち開始。status を「待ち」にし、待ち必須項目と開始日を保存する。
+ * （かんばんで「待ち」列へドロップした際の入力ドロワーから呼ばれる）
+ */
+export async function startWaiting(
+  id: string,
+  input: WaitingInput,
+): Promise<ActionResult> {
+  const parsed = waitingInputSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: formatZodError(parsed.error) };
+
+  const current = db.select().from(tasks).where(eq(tasks.id, id)).get();
+  if (!current) return { ok: false, error: "対象のタスクが見つかりません" };
+
+  const now = nowIso();
+  db.update(tasks)
+    .set({
+      status: "待ち",
+      waitingFor: parsed.data.waitingFor,
+      waitingReason: parsed.data.waitingReason,
+      waitingCheckDate: parsed.data.waitingCheckDate,
+      waitingRequestMemo: parsed.data.waitingRequestMemo,
+      // 既に待ちなら開始日は維持
+      waitingStartedAt: current.waitingStartedAt ?? now,
+      waitingEndedAt: null,
+      completedAt: null,
+      updatedAt: now,
+    })
+    .where(eq(tasks.id, id))
+    .run();
+
+  revalidatePath("/tasks");
+  return { ok: true };
+}
+
+/** 待ち解除。未着手/対応中へ戻し、終了日と返答メモを記録する。 */
+export async function endWaiting(
+  id: string,
+  input: WaitingReleaseInput,
+): Promise<ActionResult> {
+  const parsed = waitingReleaseSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: formatZodError(parsed.error) };
+
+  const now = nowIso();
+  db.update(tasks)
+    .set({
+      status: parsed.data.status,
+      waitingEndedAt: now,
+      waitingReplyMemo: parsed.data.waitingReplyMemo,
       updatedAt: now,
     })
     .where(eq(tasks.id, id))

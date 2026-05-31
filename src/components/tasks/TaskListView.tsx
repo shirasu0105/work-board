@@ -2,28 +2,26 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SortableList } from "@/components/dnd/SortableList";
 import { StatusFilter, type StatusFilterValue } from "./StatusFilter";
 import { TaskCard } from "./TaskCard";
-import { TaskFormDrawer, type Option } from "./TaskFormDrawer";
+import { WaitingList } from "./WaitingList";
 import { deleteTask, reorderTasks, setTaskStatus } from "@/lib/actions/tasks";
 import type { TaskStatus } from "@/lib/constants";
 import type { TaskWithRelations } from "@/lib/queries/tasks";
 
 interface Props {
   tasks: TaskWithRelations[];
-  categories: Option[];
-  projects: Option[];
+  onEdit: (task: TaskWithRelations) => void;
+  /** ステータスを「待ち」に変えるときは待ち入力ドロワーを開く。 */
+  onRequestWaiting: (task: TaskWithRelations) => void;
 }
 
-export function TaskListView({ tasks, categories, projects }: Props) {
+export function TaskListView({ tasks, onEdit, onRequestWaiting }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [filter, setFilter] = useState<StatusFilterValue>("all");
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<TaskWithRelations | null>(null);
 
   const counts = useMemo(() => {
     const c: Record<StatusFilterValue, number> = {
@@ -44,17 +42,13 @@ export function TaskListView({ tasks, categories, projects }: Props) {
   );
 
   const reorderEnabled = filter === "all";
-  const hasCategories = categories.length > 0;
 
-  function openCreate() {
-    setEditing(null);
-    setOpen(true);
-  }
-  function openEdit(task: TaskWithRelations) {
-    setEditing(task);
-    setOpen(true);
-  }
   function handleStatusChange(id: string, status: TaskStatus) {
+    const task = tasks.find((t) => t.id === id);
+    if (status === "待ち" && task && task.status !== "待ち") {
+      onRequestWaiting(task);
+      return;
+    }
     startTransition(async () => {
       await setTaskStatus(id, status);
       router.refresh();
@@ -75,32 +69,19 @@ export function TaskListView({ tasks, categories, projects }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <StatusFilter value={filter} onChange={setFilter} counts={counts} />
-        <Button onClick={openCreate} disabled={!hasCategories}>
-          + タスクを追加
-        </Button>
-      </div>
+    <div className="flex flex-col gap-3">
+      <StatusFilter value={filter} onChange={setFilter} counts={counts} />
 
-      {!hasCategories && (
-        <p className="text-sm text-warning">
-          先に設定画面でカテゴリを1つ以上作成してください。
-        </p>
-      )}
-
-      {visible.length === 0 ? (
+      {filter === "待ち" ? (
+        <WaitingList tasks={visible} />
+      ) : visible.length === 0 ? (
         <EmptyState
           title={filter === "all" ? "タスクがありません" : "該当するタスクがありません"}
-          description={
-            filter === "all" ? "「+ タスクを追加」から登録できます。" : undefined
-          }
+          description={filter === "all" ? "「+ タスクを追加」から登録できます。" : undefined}
         />
       ) : reorderEnabled ? (
         <>
-          <p className="text-xs text-ink-tertiary">
-            ⠿ をドラッグして並び替えできます。
-          </p>
+          <p className="text-xs text-ink-tertiary">⠿ をドラッグして並び替えできます。</p>
           <SortableList
             items={visible}
             onReorder={handleReorder}
@@ -109,7 +90,7 @@ export function TaskListView({ tasks, categories, projects }: Props) {
               <TaskCard
                 task={task}
                 handleProps={drag.handleProps}
-                onEdit={openEdit}
+                onEdit={onEdit}
                 onDelete={handleDelete}
                 onStatusChange={handleStatusChange}
               />
@@ -126,7 +107,7 @@ export function TaskListView({ tasks, categories, projects }: Props) {
               <TaskCard
                 key={task.id}
                 task={task}
-                onEdit={openEdit}
+                onEdit={onEdit}
                 onDelete={handleDelete}
                 onStatusChange={handleStatusChange}
               />
@@ -134,14 +115,6 @@ export function TaskListView({ tasks, categories, projects }: Props) {
           </div>
         </>
       )}
-
-      <TaskFormDrawer
-        open={open}
-        onClose={() => setOpen(false)}
-        categories={categories}
-        projects={projects}
-        task={editing}
-      />
     </div>
   );
 }

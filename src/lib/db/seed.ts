@@ -137,7 +137,34 @@ function main() {
     ])
     .run();
 
-  console.log("シード投入完了: カテゴリ3 / プロジェクト2 / タスク5");
+  // Inbox（未整理）
+  db.insert(schema.inboxItems)
+    .values([
+      { id: id(), content: "競合サービスの料金体系を調べる", status: "未整理", createdAt: now, updatedAt: now },
+      { id: id(), content: "歯医者の予約を取る", status: "未整理", createdAt: now, updatedAt: now },
+      { id: id(), content: "チームの振り返り会のテーマ案", status: "未整理", createdAt: now, updatedAt: now },
+    ])
+    .run();
+
+  // Someday/Maybe
+  db.insert(schema.somedayItems)
+    .values([
+      {
+        id: id(),
+        content: "英語のプレゼン講座を受講する",
+        categoryId: catStudy,
+        reason: "海外チームとの連携が増えそうなため",
+        reviewDate: daysFromNow(30),
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ])
+    .run();
+
+  console.log(
+    "シード投入完了: カテゴリ3 / プロジェクト2 / タスク5 / Inbox3 / Someday1",
+  );
 }
 
 main();

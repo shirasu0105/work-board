@@ -2,7 +2,7 @@ import { PageShell } from "@/components/layout/PageShell";
 import { listTasks } from "@/lib/queries/tasks";
 import { listActiveCategories } from "@/lib/queries/categories";
 import { listProjects } from "@/lib/queries/projects";
-import { TaskListView } from "@/components/tasks/TaskListView";
+import { TasksView } from "@/components/tasks/TasksView";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export default function TasksPage() {
 
   return (
     <PageShell title="タスク">
-      <TaskListView
+      <TasksView
         tasks={tasks}
         categories={categories.map((c) => ({ id: c.id, name: c.name }))}
         projects={projects.map((p) => ({ id: p.id, name: p.name }))}

@@ -9,6 +9,7 @@ const NAV = [
   { href: "/inbox", label: "Inbox", icon: "📥" },
   { href: "/tasks", label: "タスク", icon: "✅" },
   { href: "/projects", label: "プロジェクト", icon: "📁" },
+  { href: "/someday", label: "Someday", icon: "💭" },
   { href: "/memos", label: "メモ", icon: "📝" },
   { href: "/journal", label: "ジャーナル", icon: "📔" },
   { href: "/review", label: "レビュー", icon: "🔄" },
