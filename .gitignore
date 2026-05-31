@@ -42,6 +42,10 @@ yarn-error.log*
 # local dev / test artifacts
 /dev.log
 /.playwright-mcp
+/test-results
+/playwright-report
+/blob-report
+/.playwright
 
 # typescript
 *.tsbuildinfo

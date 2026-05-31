@@ -162,8 +162,43 @@ function main() {
     ])
     .run();
 
+  // メモ（種別サンプル）
+  db.insert(schema.memos)
+    .values([
+      {
+        id: id(),
+        title: "キックオフMTG",
+        categoryId: catWork,
+        memoType: "minutes",
+        projectId: projSite,
+        content: JSON.stringify({
+          datetime: "2026-05-30 14:00",
+          participants: "田中, 佐藤",
+          purpose: "要件確認",
+          decisions: "スコープをMVPに限定",
+          myNextAction: "議事録を共有する",
+        }),
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: id(),
+        title: "状態管理ライブラリ比較",
+        categoryId: catStudy,
+        memoType: "research",
+        content: JSON.stringify({
+          content: "主要な状態管理手法を比較",
+          findings: "サーバ状態とクライアント状態は分けて考えるのが定石",
+          conclusion: "本件はServer Components中心で十分",
+        }),
+        createdAt: now,
+        updatedAt: now,
+      },
+    ])
+    .run();
+
   console.log(
-    "シード投入完了: カテゴリ3 / プロジェクト2 / タスク5 / Inbox3 / Someday1",
+    "シード投入完了: カテゴリ3 / プロジェクト2 / タスク5 / Inbox3 / Someday1 / メモ2",
   );
 }
 

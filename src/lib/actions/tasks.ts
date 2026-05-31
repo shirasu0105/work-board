@@ -173,6 +173,24 @@ export async function deleteTask(id: string): Promise<ActionResult> {
   return { ok: true };
 }
 
+/** 予定日（今日/明日やること）のセット/解除。null で解除。 */
+export async function setTaskPlannedDate(
+  id: string,
+  plannedDate: string | null,
+): Promise<ActionResult> {
+  if (plannedDate !== null && !/^\d{4}-\d{2}-\d{2}$/.test(plannedDate)) {
+    return { ok: false, error: "日付の形式が不正です" };
+  }
+  db.update(tasks)
+    .set({ plannedDate, updatedAt: nowIso() })
+    .where(eq(tasks.id, id))
+    .run();
+  revalidatePath("/tasks");
+  revalidatePath("/journal");
+  revalidatePath("/");
+  return { ok: true };
+}
+
 /** D&D の並び替え結果（新しい id 順）から display_order を再採番。 */
 export async function reorderTasks(orderedIds: string[]): Promise<ActionResult> {
   if (!Array.isArray(orderedIds) || orderedIds.some((v) => typeof v !== "string")) {

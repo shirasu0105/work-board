@@ -33,6 +33,31 @@ export function daysSince(from: string | null | undefined, today?: Date): number
   return Math.round((base.getTime() - f.getTime()) / 86_400_000);
 }
 
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+/** ローカル基準の今日の YYYY-MM-DD。 */
+export function todayStr(today: Date = new Date()): string {
+  return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+}
+
+/** 基準日（YYYY-MM-DD またはローカル現在）から n 日後の YYYY-MM-DD。 */
+export function addDaysStr(base: string | Date, days: number): string {
+  const d =
+    typeof base === "string" ? new Date(base.slice(0, 10) + "T00:00:00") : new Date(base);
+  d.setDate(d.getDate() + days);
+  return todayStr(d);
+}
+
+/** 週初日（月曜）の YYYY-MM-DD。週次レビューの対象週に使う。 */
+export function weekStartStr(today: Date = new Date()): string {
+  const day = today.getDay(); // 0=日,1=月,...6=土
+  const offset = (day + 6) % 7; // 月曜起点までの戻し日数
+  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - offset);
+  return todayStr(d);
+}
+
 /** 表示用に "M/D" 形式へ整形。無効・空は空文字。 */
 export function formatShortDate(iso: string | null | undefined): string {
   if (!iso) return "";

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // CommonJS のテスト用スクリプト（require 使用）
+    "tests/e2e/*.cjs",
   ]),
 ]);
 
